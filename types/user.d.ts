@@ -6,7 +6,7 @@ export interface User {
     name: string;
     email: string;
     password: string;
-    role: UserRole;
+    role: string;
     profilePic: string | null;
     createdAt: string;
     updatedAt: string;
@@ -21,7 +21,7 @@ export interface UserRegister {
    name: string;
    email: string;
    password: string;
-   role: UserRole;
+   role: string;
 }
 
 export interface UserRegisterResponse {

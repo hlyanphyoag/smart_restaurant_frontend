@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
+  Row,
   SortingState,
   flexRender,
   getCoreRowModel,
@@ -15,24 +16,39 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { mkConfig, generateCsv, download } from 'export-to-csv'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { DataTablePagination } from "./tablePagination";
 import { useTableStore } from "@/store/TableStore";
 import { useStatusStore } from "@/store/StatusStore";
+import { usePathname } from "next/navigation";
 
+interface DataTableProps<TData, TValue> {
+  totalElements: number;
+  totalPages: number;
+  columns: ColumnDef<TData, TValue>[]; 
+  data: TData[];
+}
 export function DataTable<TData, TValue>({
   totalElements,
   totalPages,
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  const {setPageIndex, setPageSize, pageIndex, pageSize} = useTableStore()
-  const {status} = useStatusStore()
+  const { setPageIndex, setPageSize, pageIndex, pageSize } = useTableStore();
+  const { status } = useStatusStore();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  const [globalFilter, setGlobalFilter ] = React.useState<string>("")
+  const [globalFilter, setGlobalFilter] = React.useState<string>("");
 
   const table = useReactTable({
     data,
@@ -47,40 +63,66 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     onGlobalFilterChange: setGlobalFilter,
     initialState: {
-     pagination: {
-      pageIndex,
-      pageSize
-     } 
+      pagination: {
+        pageIndex,
+        pageSize,
+      },
     },
     state: {
       sorting,
       columnFilters,
       globalFilter,
-    pagination: {
+      pagination: {
         pageIndex,
-        pageSize
-      }
+        pageSize,
+      },
     },
     onPaginationChange: (update) => {
-      const next = typeof update === "function"
-        ? update({ pageIndex, pageSize })
-        : update;
-    
+      const next =
+        typeof update === "function" ? update({ pageIndex, pageSize }) : update;
+
       setPageIndex(next.pageIndex);
       setPageSize(next.pageSize);
     },
   });
 
+  const csvConfig = mkConfig({
+    fieldSeparator: ',',
+    filename: 'sample', // export file name (without .csv)
+    decimalSeparator: '.',
+    useKeysAsHeaders: true,
+  })
+  
+  // export function
+  // Note: change _ in Row<_>[] with your Typescript type.
+  const exportExcel = (rows: Row<any>[]) => {
+    const rowData = rows.map((row) => row.original)
+    const csv = generateCsv(csvConfig)(rowData)
+    download(csvConfig)(csv)
+  }
+
+  const pathName = usePathname();
+
   return (
-    <div className="w-5xl">
-      <div className="flex items-center justify-between  py-4">
-        <h2 className="text-xl font-semibold text-gray-600">{status ?  status === "CONFIRMED" ? "Preparing" : status.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) :  "Total"} Orders ( {totalElements} )</h2>
+    <div className="w-6xl">
+      <div className="flex items-center justify-end  py-4">
+        {/* <h2 className="text-xl font-semibold text-gray-600">
+          {status
+            ? status === "CONFIRMED"
+              ? "Preparing"
+              : status.toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase())
+            : "Total"}{" "}
+          Orders ( {totalElements} )
+        </h2> */}
         <Input
           placeholder="Filter customer..."
           value={globalFilter ?? ""}
           onChange={(e) => setGlobalFilter(e.target.value)}
           className="max-w-sm"
         />
+        {/* <Button onClick={() => exportExcel(table.getFilteredRowModel().rows)} variant="outline">
+          Export to Excel
+        </Button> */}
       </div>
       <div className="rounded-md border mb-4">
         <Table>
@@ -132,7 +174,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-        <DataTablePagination table={table}/>
+      <DataTablePagination table={table} />
     </div>
   );
 }

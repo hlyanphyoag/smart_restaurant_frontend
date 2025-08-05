@@ -1,12 +1,14 @@
+'use client'
 import { Header } from "@/components/Header";
-import { getServerSession } from "next-auth";
 import { User } from "@/types/user";
+import { useSession } from "next-auth/react";
 
-export default async function CashierLayout({children} : {children : React.ReactNode}) {
-    const session = await getServerSession();
+
+export default  function CashierLayout({children} : {children : React.ReactNode}) {
+    const session =  useSession();
     return (
         <div >
-            <Header user={session?.user as User}/>
+            <Header user={session?.data?.user as User}/>
             {children}
         </div>
     )

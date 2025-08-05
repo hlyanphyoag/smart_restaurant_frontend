@@ -24,6 +24,7 @@ const handleSubmit = async (data: z.infer<typeof singInSchema>) => {
   } else {
     window.location.href = res?.url || "/";  
   }
+  return { success: true };
 };
 
   const defaultValues = {

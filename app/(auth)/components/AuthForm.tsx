@@ -4,37 +4,45 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { StatefullButton } from "@/components/ui/statefull-button";
 import { FIELD_NAMES, FIELD_TYPES } from "@/constants";
 import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { DefaultValues, FieldValues, Path, SubmitHandler, useForm, UseFormReturn } from "react-hook-form"
-import { ZodType } from "zod"
+import { ZodTypeAny } from "zod"
 
 
 
 interface Props <T extends FieldValues> {
-    schema: ZodType<T>,
+    schema: ZodTypeAny,
     defaultValues: T,
     onSubmit: (data : T ) => Promise<{success: boolean; error?: string}>,
     type: 'SIGN_IN' | 'SIGN_UP'
 }
 export const AuthFrom = <T extends FieldValues> ({type, schema, defaultValues, onSubmit}: Props<T>) => {
 
+    const [isPending, setIsPending] = useState(false)
+    const [isSuccess, setIsSuccess] = useState(false)
+
     const router = useRouter();
     const isSignIn = type === 'SIGN_IN';
 
-    const form  : UseFormReturn<T> = useForm({
+    const form  : UseFormReturn<T> = useForm<T>({
         resolver: zodResolver(schema),
         defaultValues: defaultValues as DefaultValues<T>
     });
 
     const handleSubmit: SubmitHandler<T> = async (data) => {
+        setIsPending(true)
         console.log('Data:', data)
         const result = await onSubmit(data)
         if(result){
-            router.push('/')
+            setIsPending(false)
+            setIsSuccess(true)
+            router.push('/')      
         }else{
             console.log('OnSubmit Error')
         }
@@ -75,7 +83,12 @@ export const AuthFrom = <T extends FieldValues> ({type, schema, defaultValues, o
                     <Link href={isSignIn ? '/sign-up' : '/sign-in'}>{isSignIn ? 'Sign Up' : 'Sign In'}</Link>
                 </CardDescription>
                 <CardFooter className="mt-4">
-                    <Button className="w-full" type="submit">{isSignIn ? 'Sign In' : 'Sign Up'}</Button>
+                    <StatefullButton 
+                        isLoading = {isPending}
+                        isSuccess = {isSuccess}
+                        className="w-full" 
+                        type="submit"
+                        >{isSignIn ? 'Sign In' : 'Sign Up'}</StatefullButton>
                 </CardFooter>
             </form>
             </Form>

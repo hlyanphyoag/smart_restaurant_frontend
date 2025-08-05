@@ -1,7 +1,7 @@
 export interface Food {
     id: number;
     name: string;
-    image: string[];
+    images: string[];
     description: string;
     price: number;
     createdAt: string;
@@ -16,5 +16,17 @@ export interface GetFoodResponse {
     currenElements: number;
     nextPage: number | null;
     results: Food[];
+}
+
+export interface AddFoodItem {
+    name: string;
+    description: string;
+    price: number;
+    images: string[];
+    ingredients: {
+        name: string,
+        id: string,
+        quantity: number
+    }[]
 }
 

@@ -1,3 +1,5 @@
+import { Boxes, ClipboardList, LayoutDashboard, User, User2, UserRoundPen, Users, UserX2Icon, Utensils } from "lucide-react";
+
 export const FIELD_NAMES = {
     name: 'User Name',
     email: 'User Email',
@@ -12,31 +14,70 @@ export const FIELD_TYPES = {
     role : 'select'
 }
 
+export const FOOD_FIELD_NAMES = {
+    name: 'Food Name',
+    description: 'Food Description',
+    price: 'Food Price', 
+    images: 'Food Images',
+    ingredients: 'Food Ingredients'
+}
+
+export const FOOD_FIELD_TYPES = {
+    name: 'text',
+    description: 'textarea',
+    price: 'number',
+    images: 'file',
+    ingredients: 'select'
+}
+
 
 export const adminSideBarLinks = [
     {
-      img: "/icons/admin/home.svg",
+      icon: LayoutDashboard,
       route: "/admin",
-      text: "Home",
+      text: "Dashboard",
     },
     {
-      img: "/icons/admin/users.svg",
-      route: "/admin/users",
-      text: "All Users",
+      icon: Utensils,
+      route: "/admin/products",
+      text: "Menu",
     },
     {
-      img: "/icons/admin/book.svg",
-      route: "/admin/books",
-      text: "All Books",
-    },
-    {
-      img: "/icons/admin/bookmark.svg",
-      route: "/admin/order-records",
+      icon: ClipboardList,
+      route: "/admin/orders",
       text: "Order Records",
     },
     {
-      img: "/icons/admin/user.svg",
-      route: "/admin/account-requests",
-      text: "Account Requests",
+      icon: Users,
+      route: "/admin/users",
+      text: "Customers",
     },
+    // {
+    //   icon: "/icons/admin/user.svg",
+    //   route: "/admin/account-requests",
+    //   text: "Account Requests",
+    // },
   ];
+
+  export const adminStatus = [
+    {
+      icon: Users,
+      text: "Total Customers",
+      count: 447,
+    },
+    {
+      icon: Boxes,
+      text: "Total Products",
+      count: 147,
+    },
+    {
+      icon: ClipboardList,
+      text: "Total Orders",
+      count: 147,
+    },
+    {
+      icon: UserRoundPen,
+      text: "Total Employe",
+      count: 147,
+    }
+  ]

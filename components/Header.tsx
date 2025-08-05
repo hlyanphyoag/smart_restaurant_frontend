@@ -21,34 +21,47 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import { LogOutIcon, User2Icon } from "lucide-react";
+import {
+  BellIcon,
+  CalculatorIcon,
+  History,
+  HistoryIcon,
+  List,
+  LogOutIcon,
+  PlusCircle,
+  User2Icon,
+} from "lucide-react";
 import { signOut } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
+import { Button } from "./ui/button";
+import { notiStore } from "@/store/StatusStore";
+import CheckOutCard from "@/app/(home)/component/CheckOutCard";
 
 export function Header({ user }: { user: User }) {
+  const router = useRouter();
+  const { notifications, removeNotification } = notiStore();
+
   const navItems = [
     {
-      name: "Features",
-      link: "#features",
+      name: "Order History",
+      link: "/order-history",
     },
     {
-      name: "Pricing",
-      link: "#pricing",
-    },
-    {
-      name: "Contact",
-      link: "#contact",
+      name: "Notifications",
+      link: "/notifications",
     },
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     await signOut({
       redirect: false,
-    })
-    return redirect('/sign-in')
-  }
+    });
+    return redirect("/sign-in");
+  };
+
+  console.log("User from Header:", user?.role);
 
   return (
     <div className="relative w-full p-4">
@@ -56,8 +69,67 @@ export function Header({ user }: { user: User }) {
         {/* Desktop Navigation */}
         <NavBody>
           <NavbarLogo />
-          {/* <NavItems items={navItems} /> */}
           <div className="flex items-center gap-4">
+            {user?.role === "CUSTOMER" && (
+              <div className="flex items-center gap-2">
+                <Button
+                  className="relative"
+                  onClick={() => {
+                    router.push("/order-history");
+                    removeNotification();
+                  }}
+                  size="icon"
+                  variant="secondary"
+                >
+                  <HistoryIcon size={28} />
+                  {notifications.length > 0 && (
+                    <span className="absolute top-0 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  )}
+                </Button>
+
+                {/* <div>
+                  <Button
+                    className="relative"
+                    onClick={() => {
+                      router.push("/notifications");
+                    }}
+                    size="icon"
+                    variant="secondary"
+                  >
+                    <BellIcon size={28} />
+                  </Button>
+                </div> */}
+              </div>
+            )}
+            {user?.role === "CASHIER" && (
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => router.push("/cashier/pos/")}
+                  size="icon"
+                  variant="secondary"
+                >
+                  <CalculatorIcon size={28} />
+                </Button>
+              </div>
+            )}
+            {user?.role === "STOCKHOLDER" && (
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => router.push("/stockholder/add-ingredient")}
+                  size="icon"
+                  variant="secondary"
+                >
+                  <PlusCircle size={28} />
+                </Button>
+                <Button
+                  onClick={() => router.push("/stockholder/all-ingredient")}
+                  size="icon"
+                  variant="secondary"
+                >
+                  <List size={28} />
+                </Button>
+              </div>
+            )}
             <DropdownMenu>
               <DropdownMenuTrigger className="cursor-pointer">
                 <NavbarButton
@@ -69,12 +141,15 @@ export function Header({ user }: { user: User }) {
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="end">
                 <DropdownMenuItem className="cursor-pointer text-gray-600 flex items-center justify-start">
-                        <User2Icon  size={28}/>
-                      Profile
+                  <User2Icon size={28} />
+                  Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer text-gray-600 flex items-center justify-start" onClick={handleLogout}>
-                      <LogOutIcon size={28}/>
-                      Logout
+                <DropdownMenuItem
+                  className="cursor-pointer text-gray-600 flex items-center justify-start"
+                  onClick={handleLogout}
+                >
+                  <LogOutIcon size={28} />
+                  Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -95,31 +170,38 @@ export function Header({ user }: { user: User }) {
             isOpen={isMobileMenuOpen}
             onClose={() => setIsMobileMenuOpen(false)}
           >
-            {navItems.map((item, idx) => (
-              <a
-                key={`mobile-link-${idx}`}
-                href={item.link}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="relative text-neutral-600 dark:text-neutral-300"
-              >
-                <span className="block">{user?.name}</span>
-              </a>
-            ))}
             <div className="flex w-full flex-col gap-4">
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full"
-              >
-                Login
-              </NavbarButton>
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full"
-              >
-                Book a call
-              </NavbarButton>
+              <div className="flex  justify-between items-center">
+              <div className="border border-gray-400 p-3 rounded-full">
+                {user.name[0]}
+              </div>
+              <Button
+                  className="relative"
+                  onClick={() => {
+                    router.push("/order-history");
+                    removeNotification();
+                  }}
+                  size="icon"
+                  variant="secondary"
+                >
+                  <HistoryIcon size={28} />
+                  {notifications.length > 0 && (
+                    <span className="absolute top-0 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  )}
+                </Button>
+                <Button
+                  variant='secondary'
+                  onClick={handleLogout}
+                >
+                  <LogOutIcon size={20} />
+                  <small>Logout</small>
+                </Button>
+              </div>
+
+              <div>
+                <h1 className="text-md font-semibold">Your Cart</h1>
+              </div>
+              <CheckOutCard />
             </div>
           </MobileNavMenu>
         </MobileNav>

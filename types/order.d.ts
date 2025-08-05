@@ -5,8 +5,10 @@ interface orderItem {
 }
 
 export interface postOrder {
-    customerId: string;
+    customerId: string ;
+    totalCost: number;
     tableId: string | null;
+    address: string ;
     orderItems: orderItem[]
 }
 
@@ -36,6 +38,9 @@ export interface postOrderResponse {
             createdAt: string,
             updatedAt: string
         },
+        bill: {
+            id: string
+        }
         _count: {
             items: number
         }

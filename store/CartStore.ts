@@ -12,7 +12,6 @@ interface CartStore {
 
 export const useCartStore = create<CartStore>((set) => ({
     cart: [],
-
     addToCart: (item: any) => set((prev: any) => {
         const existingItem = prev.cart.find((prevItem : any) => prevItem.id === item.id)
         if(existingItem) {

@@ -58,22 +58,22 @@ const SuccessPage = () => {
                 </div>
                 <div className='flex items-center gap-x-4'>
                   <h2 className='text-sm font-semibold text-gray-600'>Total: </h2>
-                  <small className='text-xl font-semibold text-green-400'>${GrandTotalPrice(cart)}</small>
+                  <small className='text-xl font-semibold text-green-400'>${OrderData?.totalCost}</small>
                 </div>
             </div>
             <div className='flex flex-col gap-y-2'>
               {/* <h2 className='text-lg mb-2 font-semibold text-gray-600'>Your Items</h2> */}
-              {cart?.map((item: any, index: number) => (
+              {OrderData?.items?.map((item: any, index: number) => (
                 <div className='flex flex-col bg-neutral-100 p-4 rounded-2xl' key={index}>
                   <div className='flex flex-row items-center justify-between gap-x-4'>
                     <div className='flex items-center gap-x-2'>
-                      <div className='h-10 w-10 rounded-2xl bg-green-400'></div>
+                      <img src={item.foodItem?.images[item.foodItem?.images.length - 1]} alt={item.foodItem?.name} className="w-10 h-10 rounded-full" />
                       <div>
-                        <h2 className='text-sm font-semibold text-gray-600'>{item.name}</h2>
+                        <h2 className='text-sm font-semibold text-gray-600'>{item.foodItem?.name}</h2>
                         <small className='text-sm text-gray-500'>Qty - {item.quantity}</small>
                       </div>
                     </div>
-                     <small className='text-sm font-semibold text-green-400'>${item.totalPrice ? item.totalPrice : item.price}</small>
+                     <small className='text-sm font-semibold text-green-400'>${(item.foodItem.price * item.quantity).toFixed(2)}</small>
                   </div>
                 </div>
               ))}

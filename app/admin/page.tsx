@@ -1,14 +1,15 @@
+
 import React from 'react'
-import SideBar from './Components/SideBar'
-import { getSession, useSession } from 'next-auth/react'
+import DashBoardStatus from './Components/DashBoardStatus'
+import {  ChartBarDefault } from './Components/example_chart'
+import { ChartPieDonutText} from './Components/chart_pie'
+import { ChartLineDefault } from './Components/line_chart'
+import DashBoardPage from './Components/DashBoardPage'
 
 const page = async() => {
-    const session = await getSession()
-    console.log(session?.user)
+
   return (
-    <div>
-      <SideBar session={session!}/>
-    </div>
+   <DashBoardPage />
   )
 }
 

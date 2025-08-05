@@ -6,7 +6,9 @@ const page = () => {
   return (
     <div className='max-w-7xl flex flex-col lg:flex-row items-start'>
       <OrderCard />
-      <CheckOutCard />
+      <div className='hidden xl:flex'>
+        <CheckOutCard />
+      </div>
     </div>
   )
 }
