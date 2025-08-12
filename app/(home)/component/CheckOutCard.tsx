@@ -14,160 +14,106 @@ import { useSession } from "next-auth/react";
 import { useOrderMutation } from "@/services/OrderServices/order.queryMutation";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import PaymentModal from "./PaymentModal";
+import { MinusIcon, PlusIcon, XIcon } from "lucide-react";
 
 const CheckOutCard = () => {
-  const router = useRouter();
-  const { id: tableId } = useParams();
-  const { data: session } = useSession();
-  
-  const searchParams = useSearchParams();
-  const address = searchParams.get("address");
-
   const {
     cart,
     decreaseQuantity,
     increaseQuantity,
     removeAllCart,
     GrandTotalPrice,
+    removeFromCart,
   } = useCartStore();
-  const [orderId, setOrderId] = useState<string | null>(null);
-
-  const orderItem = cart?.map((item: any) => {
-    return {
-      foodItemId: item.id,
-      quantity: item.quantity,
-      note: item.note,
-    };
-  });
-
-  const { mutate: postOrder } = useOrderMutation();
-  // const { mutate: tableMutation } = useTableMutation();
-  // const { mutate: stripeMutation } = useStripeInitiateMutation();
-
-  const handleSubmit = () => {
-    postOrder(
-      {
-        tableId: tableId as string,
-        customerId: session?.user?.id!,
-        totalCost: Number(GrandTotalPrice(cart)),
-        orderItems: orderItem,
-        address: address ? address : ""
-      },
-      {
-        onSuccess: (data) => {
-          setOrderId(data.bill.id);
-          // stripeMutation(data.bill.id, {
-          //   onSuccess: (StripeData) => {
-          //     console.log("StripeSuccess:", StripeData.url)
-          //     window.location.href = StripeData.url
-          //     return
-          //   },
-          //   onError: (error) => {
-          //     console.log("StripeError_really:", error)
-          //   }
-          // })
-          //   tableMutation({
-          //     tableId: data.tableId,
-          //     occupied: !data.table.occupied
-          //   },
-          //   {
-          //     onSuccess: (data) => {
-          //       console.log('TableSuccess:', data)
-          //     },
-          //     onError: (error) => {
-          //       console.log('TableError:', error)
-          //     }
-          //   }
-          // )
-          // billMutation({or})
-
-          console.log("OrderSuccess:", data);
-          // router.push(`/success/${data.id}`)
-        },
-        onError: (error) => {
-          console.log("OrderError:", error);
-        },
-      }
-    );
-  };
 
   console.log("Cart:", cart);
 
   return (
-    <Card className="min-w-xs col-span-2">
+    <Card className="min-w-xs col-span-2 shadow-lg border-2 border-gray-100 rounded-2xl bg-white">
       <CardHeader>
-        <CardTitle>Order Confirm</CardTitle>
+        <CardTitle className="text-2xl font-bold tracking-tight text-gray-800">
+          Cart
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        {cart ? (
-          <div className="flex flex-col gap-6">
+        {cart.length ? (
+          <div className="flex flex-col gap-4">
             {cart.map((item: any, index: number) => (
               <div
                 key={index}
-                className="flex justify-center items-center gap-x-4"
+                className="flex flex-col items-center justify-between gap-4 bg-gray-50 rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow border border-gray-100 relative"
               >
-                <div className="flex gap-x-2 items-center justify-center">
+                <div className="flex gap-3 items-center">
                   <img
                     src={item.images[0]}
                     alt={item.name}
-                    className="w-13 h-13 rounded-full"
+                    className="w-14 h-14 rounded-full object-cover border-2 border-gray-200 shadow"
                   />
-                  <p className="text-sm text-gray-600 font-semibold">
-                    {item.name}
-                  </p>
+                  <div>
+                    <p className="text-base font-semibold text-gray-800 truncate max-w-[120px]">
+                      {item.name}
+                    </p>
+                    <p className="text-sm text-green-600 font-bold mt-1">
+                      ${item.totalPrice ? item.totalPrice : item.price}
+                    </p>
+                  </div>
                 </div>
-
-                <div className="flex items-center gap-x-2">
+                <div className="flex items-center gap-2 bg-white rounded-lg px-2 py-1">
                   <Button
                     variant="outline"
+                    size="icon"
+                    className="hover:bg-gray-200 transition-colors"
                     onClick={() => decreaseQuantity(item.id)}
                   >
-                    -
+                    <MinusIcon size={18} />
                   </Button>
-                  <p className="text-sm text-gray-600 font-semibold">
+                  <span className="text-base font-semibold text-gray-700 px-2 min-w-[24px] text-center">
                     {item.quantity}
-                  </p>
+                  </span>
                   <Button
                     disabled={item.quantity === item.availableQuantity}
                     variant="outline"
+                    size="icon"
+                    className="hover:bg-gray-200 transition-colors"
                     onClick={() => increaseQuantity(item.id)}
                   >
-                    +
+                    <PlusIcon size={18} />
                   </Button>
-                </div>
-
-                <div>
-                  <p className="text-sm text-gray-600 font-medium">
-                    ${item.totalPrice ? item.totalPrice : item.price}
-                  </p>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hover:bg-red-100 text-red-500 ml-2"
+                    onClick={() => removeFromCart(item.id)}
+                  >
+                    <XIcon size={18} />
+                  </Button>
                 </div>
               </div>
             ))}
-            <CardFooter className="flex flex-row items-center justify-end gap-2">
-              <p className="text-sm text-gray-600 font-semibold">
-                Total Price -{" "}
-              </p>
-              <p className="text-xl font-semibold text-green-400">
-                ${GrandTotalPrice(cart)}
-              </p>
+            <CardFooter className="flex flex-row items-center justify-between gap-2 mt-4 border-t pt-4 border-gray-200">
+              <span className="text-lg font-semibold text-gray-700">Total</span>
+              <span className="text-2xl font-bold text-green-500">
+                ${GrandTotalPrice()}
+              </span>
             </CardFooter>
-            <div className="flex flex-col justify-center items-center gap-y-2">
+            <div className="flex flex-col gap-2 mt-2">
               <Dialog>
                 <DialogTrigger asChild>
                   <Button
+                    disabled={cart.length === 0}
                     type="button"
                     variant="customize"
-                    className="w-full"
-                    onClick={handleSubmit}
+                    className="w-full py-3 text-lg font-semibold rounded-xl shadow hover:bg-green-500 hover:text-white transition-colors"
                   >
                     Checkout
                   </Button>
                 </DialogTrigger>
-                <PaymentModal orderId={orderId!}/>
+                <PaymentModal />
               </Dialog>
               <Button
                 variant="secondary"
-                className="w-full"
+                className="w-full py-3 text-lg font-semibold rounded-xl shadow hover:bg-gray-200 transition-colors"
+                disabled={cart.length === 0}
                 onClick={removeAllCart}
               >
                 Clear Cart
@@ -175,7 +121,28 @@ const CheckOutCard = () => {
             </div>
           </div>
         ) : (
-          <p>No items in cart</p>
+          <div className="flex flex-col items-center justify-center py-10 gap-4 text-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-16 h-16 text-gray-300"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M2.25 3.75h1.386c.51 0 .955.343 1.087.836l.383 1.437m0 0l1.7 6.385m.563 2.116A2.25 2.25 0 009.75 17.25h7.5a2.25 2.25 0 002.25-2.25V7.5a2.25 2.25 0 00-2.25-2.25h-11.1l-.383-1.437A1.125 1.125 0 004.386 3.75H2.25m3.75 3.75h13.5m-10.5 9.75a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm10.5 0a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"
+              />
+            </svg>
+            <h3 className="text-lg font-semibold text-gray-600">
+              Your cart is empty!
+            </h3>
+            <p className="text-gray-400">
+              Looks like you haven't added anything yet.
+            </p>
+          </div>
         )}
       </CardContent>
     </Card>

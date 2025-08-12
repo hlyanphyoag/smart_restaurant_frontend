@@ -15,7 +15,9 @@ import { useSocketContext } from "@/provider/SocketContextProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { SkeletonKitChen } from "@/app/kitchen/components/SkeletonForKitchen";
 import { Badge } from "@/components/ui/badge";
-import { formatDate } from "date-fns";
+import { AnimatedCircularProgressBar } from "@/components/ui/moving-progress";
+import { format } from "date-fns";
+import Link from "next/link";
 
 interface CommonCardProps {
   OrderData: any;
@@ -75,65 +77,116 @@ const HistoryPage = ({
       {OrderData?.map((order: any, index: number) => {
         console.log("OrderStatus:", order.status);
         return (
-          <Card key={index} className={clsx(`mb-2`)}>
-            <CardContent>
-              <div className="flex flex-col mb-6">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-md font-semibold">Order</h2>
-                  <small className="text-sm text-blue-500">#{order.id}</small>
-                </div>
-                <div>
-                  <Badge variant="outline" className="text-xs">
-                    {order.status === "READY"
-                      ? "Ready"
-                      : order.status === "PENDING"
-                      ? "Pending"
-                      :order.status === "COMPLETED"
-                      ? "Complete"
-                      : "Progress"}
-                  </Badge>
-                </div>
-              </div>
-              {order.items.map((item: any, index: number) => (
-                <div key={index} className="flex flex-col mt-2">
-                  <div className="flex justify-between">
-                    <div className="flex justify-center items-center gap-x-2">
-                      <img
-                        src={
-                          item?.foodItem?.images[
-                            item.foodItem.images.length - 1
-                          ]
-                        }
-                        alt=""
-                        className="w-8 h-8 rounded-full"
-                      />
-                      <div className="flex flex-col">
-                        <small className="text-sm font-semibold">
-                          {item.foodItem.name}
-                        </small>
-                        <small className="text-xs font-semibold">
-                          ${item.foodItem.price}
-                        </small>
-                      </div>
-                    </div>
-                    <div>
-                      <small className="text-sm">Qty - {item.quantity}</small>
-                    </div>
+          <Link key={order.id} href={`/order-history/${order.id}`}>
+            <Card className={clsx(`mb-2 cursor-pointer`)}>
+              <CardContent>
+                <div className="flex flex-col mb-6">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-md font-semibold">Order</h2>
+                    <small className="text-sm text-blue-500">#{order.id}</small>
+                  </div>
+                  <div className="flex gap-x-2 items-center">
+                    <Badge variant="outline" className="text-xs">
+                      {order.status === "READY"
+                        ? "Ready"
+                        : order.status === "PENDING"
+                        ? "Pending"
+                        : order.status === "COMPLETED"
+                        ? "Complete"
+                        : "Progress"}
+                    </Badge>
+                    {order.bill && (
+                      <Badge
+                        variant={order.bill.paid ? "secondary" : "destructive"}
+                        className={`text-xs ${
+                          order.bill.paid
+                            ? "bg-green-100 text-green-600"
+                            : "bg-red-100 text-red-600"
+                        }`}
+                      >
+                        {order.bill.paid ? "Paid" : "Not Paid"}
+                      </Badge>
+                    )}
                   </div>
                 </div>
-              ))}
-            </CardContent>
-            <CardFooter>
-              <div className="flex w-full items-center justify-between">
-                <small className="text-sm font-semibold">
-                  Total: ${order.totalCost}
-                </small>
-                <small className="text-sm text-muted-foreground">
-                  {formatDate(order.createdAt, "dd MMMM yy, HH:mm:ss")}
-                </small>
-              </div>
-            </CardFooter>
-          </Card>
+                {order.items.map((item: any, index: number) => (
+                  <div key={index} className="flex flex-col mt-2">
+                    <div className="flex justify-between">
+                      <div className="flex justify-center items-center gap-x-2">
+                        <img
+                          src={
+                            item?.foodItem?.images[
+                              item.foodItem.images.length - 1
+                            ]
+                          }
+                          alt=""
+                          className="w-8 h-8 rounded-full"
+                        />
+                        <div className="flex flex-col">
+                          <small className="text-sm font-semibold">
+                            {item.foodItem.name}
+                          </small>
+                          <small className="text-xs font-semibold">
+                            ${item.foodItem.price}
+                          </small>
+                        </div>
+                      </div>
+                      <div>
+                        <small className="text-sm">Qty - {item.quantity}</small>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+              <CardFooter>
+                <div className="flex w-full items-center justify-between">
+                  <div className="flex flex-col items-center justify-center">
+                    <AnimatedCircularProgressBar
+                      max={100}
+                      min={0}
+                      fontSize="text-sm"
+                      value={
+                        order.status === "PENDING"
+                          ? 10
+                          : order.status === "CONFIRMED"
+                          ? 50
+                          : order.status === "READY"
+                          ? 75
+                          : order.status === "COMPLETED"
+                          ? 100
+                          : 25
+                      }
+                      gaugePrimaryColor="#2563eb"
+                      gaugeSecondaryColor="#d1d5db"
+                      className="w-12 h-12"
+                    />
+                    <span className="text-xs mt-1">
+                      {order.status === "PENDING"
+                        ? "Pending"
+                        : order.status === "CONFIRMED"
+                        ? "Confirmed"
+                        : order.status === "READY"
+                        ? "Ready"
+                        : order.status === "COMPLETED"
+                        ? "Completed"
+                        : "Progress"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <small className="text-sm font-semibold">
+                      Total: ${order.totalCost}
+                    </small>
+                    <small className="text-sm text-muted-foreground">
+                      {format(
+                        new Date(order.createdAt),
+                        "MMM dd, yyyy • hh:mm a"
+                      )}
+                    </small>
+                  </div>
+                </div>
+              </CardFooter>
+            </Card>
+          </Link>
         );
       })}
 

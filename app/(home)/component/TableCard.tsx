@@ -18,14 +18,17 @@ import Lottie from "lottie-react";
 const TableCard = () => {
   const { data: table, isPending, isError } = useTableQuery();
 
-  if (isPending) return <div className="w-75 h-75 flex items-start justify-center">
-    <Lottie
-        animationData={require("@/public/loading.json")}
-        loop={true}
-        autoPlay={true}
-        className="w-4 h-4"
-      />
-  </div>;
+  if (isPending)
+    return (
+      <div className="w-75 h-75 flex items-start justify-center">
+        <Lottie
+          animationData={require("@/public/loading.json")}
+          loop={true}
+          autoPlay={true}
+          className="w-4 h-4"
+        />
+      </div>
+    );
   if (isError)
     return (
       <div className="text-center text-xl text-red-500">
@@ -76,15 +79,15 @@ const TableCard = () => {
                 <p className="text-sm text-gray-400">{table.seats} people</p>
               </div>
               <CardAction className="w-full">
-                <Link href={`/dine-in/${table.id}`}>
-                  <Button
-                    variant="customize"
-                    disabled={table.occupied}
-                    className="w-full"
-                  >
+                <Button
+                  variant="customize"
+                  disabled={table.occupied}
+                  className="w-full"
+                >
+                  <Link className="w-full" href={`/dine-in/${table.id}`}>
                     Book Table
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </CardAction>
             </CardFooter>
           </Card>

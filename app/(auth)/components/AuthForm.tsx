@@ -1,98 +1,133 @@
-'use client'
+"use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { StatefullButton } from "@/components/ui/statefull-button";
 import { FIELD_NAMES, FIELD_TYPES } from "@/constants";
-import { zodResolver } from "@hookform/resolvers/zod"
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { DefaultValues, FieldValues, Path, SubmitHandler, useForm, UseFormReturn } from "react-hook-form"
-import { ZodTypeAny } from "zod"
+import {
+  DefaultValues,
+  FieldValues,
+  Path,
+  SubmitHandler,
+  useForm,
+  UseFormReturn,
+} from "react-hook-form";
+import { ZodTypeAny } from "zod";
 
-
-
-interface Props <T extends FieldValues> {
-    schema: ZodTypeAny,
-    defaultValues: T,
-    onSubmit: (data : T ) => Promise<{success: boolean; error?: string}>,
-    type: 'SIGN_IN' | 'SIGN_UP'
+interface Props<T extends FieldValues> {
+  schema: ZodTypeAny;
+  defaultValues: T;
+  onSubmit: (data: T) => Promise<{ success: boolean; error?: string }>;
+  type: "SIGN_IN" | "SIGN_UP";
 }
-export const AuthFrom = <T extends FieldValues> ({type, schema, defaultValues, onSubmit}: Props<T>) => {
+export const AuthFrom = <T extends FieldValues>({
+  type,
+  schema,
+  defaultValues,
+  onSubmit,
+}: Props<T>) => {
+  const [isPending, setIsPending] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-    const [isPending, setIsPending] = useState(false)
-    const [isSuccess, setIsSuccess] = useState(false)
+  const router = useRouter();
+  const isSignIn = type === "SIGN_IN";
 
-    const router = useRouter();
-    const isSignIn = type === 'SIGN_IN';
+  const form: UseFormReturn<T> = useForm<T>({
+    resolver: zodResolver(schema),
+    defaultValues: defaultValues as DefaultValues<T>,
+  });
 
-    const form  : UseFormReturn<T> = useForm<T>({
-        resolver: zodResolver(schema),
-        defaultValues: defaultValues as DefaultValues<T>
-    });
-
-    const handleSubmit: SubmitHandler<T> = async (data) => {
-        setIsPending(true)
-        console.log('Data:', data)
-        const result = await onSubmit(data)
-        if(result){
-            setIsPending(false)
-            setIsSuccess(true)
-            router.push('/')      
-        }else{
-            console.log('OnSubmit Error')
-        }
+  const handleSubmit: SubmitHandler<T> = async (data) => {
+    setIsPending(true);
+    console.log("Data:", data);
+    const result = await onSubmit(data);
+    console.log(result);
+    if (result.success) {
+      setIsSuccess(true);
+      router.push("/");
+    } else {
+      setIsSuccess(false);
+      console.log("OnSubmit Error");
     }
 
-    return (
-        <Card className="flex flex-col w-full p-4 lg:max-w-lg">  
-            <CardHeader>
-                <CardTitle className="text-center">{isSignIn ? 'Sign In' : 'Register'}</CardTitle>
-            </CardHeader>
-        
-            <Form {...form}> 
-            <form onSubmit={form.handleSubmit(handleSubmit)} >
-                <CardContent className="space-y-4">
-                {Object.keys(defaultValues).map((field) => (
-                    <FormField 
-                    key={field}
-                    control={form.control}
-                    name={field as Path<T>}
-                    render={({field}) => (
-                        <FormItem >
-                            <FormLabel className="capitalize">{field.name as keyof typeof FIELD_NAMES}</FormLabel>
-                            <FormControl>
-                                <Input
-                                required
-                                type = {FIELD_TYPES[field.name as keyof typeof FIELD_TYPES]}
-                                {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                ))}
-                </CardContent>
-                <CardDescription className="flex items-center justify-center gap-2 m-4">
-                    {isSignIn ? 'Don\'t have and account?' : 'Already have an account?'}
-                    <Link href={isSignIn ? '/sign-up' : '/sign-in'}>{isSignIn ? 'Sign Up' : 'Sign In'}</Link>
-                </CardDescription>
-                <CardFooter className="mt-4">
-                    <StatefullButton 
-                        isLoading = {isPending}
-                        isSuccess = {isSuccess}
-                        className="w-full" 
-                        type="submit"
-                        >{isSignIn ? 'Sign In' : 'Sign Up'}</StatefullButton>
-                </CardFooter>
-            </form>
-            </Form>
-        </Card>
-    )
+    setIsPending(false);
+  };
 
-}
+  return (
+    <Card className="flex flex-col w-full p-4 lg:max-w-lg">
+      <CardHeader>
+        <CardTitle className="text-center">
+          {isSignIn ? "Sign In" : "Register"}
+        </CardTitle>
+      </CardHeader>
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)}>
+          <CardContent className="space-y-4">
+            {Object.keys(defaultValues).map((field) => (
+              <FormField
+                key={field}
+                control={form.control}
+                name={field as Path<T>}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="capitalize">
+                      {field.name as keyof typeof FIELD_NAMES}
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        required
+                        type={
+                          FIELD_TYPES[field.name as keyof typeof FIELD_TYPES]
+                        }
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
+          </CardContent>
+          <CardDescription className="flex items-center justify-center gap-2 m-4">
+            {isSignIn ? "Don't have and account?" : "Already have an account?"}
+            <Link href={isSignIn ? "/sign-up" : "/sign-in"}>
+              {isSignIn ? "Sign Up" : "Sign In"}
+            </Link>
+          </CardDescription>
+          <CardFooter className="mt-4">
+            <StatefullButton
+              isLoading={isPending}
+              isSuccess={isSuccess}
+              className="w-full"
+              type="submit"
+            >
+              {isSignIn ? "Sign In" : "Sign Up"}
+            </StatefullButton>
+          </CardFooter>
+        </form>
+      </Form>
+    </Card>
+  );
+};

@@ -1,7 +1,8 @@
 "use client";
 import { cn } from "@/lib/utils";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { motion, useAnimate } from "framer-motion";
+import { XCircleIcon } from "lucide-react";
 
 interface ButtonProps
   extends Omit<
@@ -23,8 +24,33 @@ export const StatefullButton = ({
 }: ButtonProps) => {
   const [scope, animate] = useAnimate();
 
+  // Track if component has mounted to avoid showing X icon on initial render
+  const isFirstRender = useRef(true);
+
   useEffect(() => {
     const animateStates = async () => {
+      if (isFirstRender.current) {
+        // On first render, just reset all icons to hidden state
+        await Promise.all([
+          animate(
+            ".loader",
+            { width: 0, scale: 0, opacity: 0 },
+            { duration: 0.1 }
+          ),
+          animate(
+            ".check",
+            { width: 0, scale: 0, opacity: 0 },
+            { duration: 0.1 }
+          ),
+          animate(
+            ".xmark",
+            { width: 0, scale: 0, opacity: 0 },
+            { duration: 0.1 }
+          ),
+        ]);
+        isFirstRender.current = false;
+        return;
+      }
       if (isLoading) {
         // Show loader and hide check
         await Promise.all([
@@ -35,6 +61,11 @@ export const StatefullButton = ({
           ),
           animate(
             ".check",
+            { width: 0, scale: 0, opacity: 0 },
+            { duration: 0.1 }
+          ),
+          animate(
+            ".xmark",
             { width: 0, scale: 0, opacity: 0 },
             { duration: 0.1 }
           ),
@@ -62,6 +93,29 @@ export const StatefullButton = ({
             { duration: 0.2 }
           );
         }, 2000);
+      } else if (!isSuccess && !isLoading) {
+        // First hide loader if it's visible
+        await animate(
+          ".loader",
+          { width: 0, scale: 0, opacity: 0 },
+          { duration: 0.2 }
+        );
+
+        // Then show checkmark
+        await animate(
+          ".xmark",
+          { width: 20, scale: 1, opacity: 1 },
+          { duration: 0.3 }
+        );
+
+        // After delay, hide checkmark
+        setTimeout(async () => {
+          await animate(
+            ".xmark",
+            { width: 0, scale: 0, opacity: 0 },
+            { duration: 0.2 }
+          );
+        }, 2000);
       } else {
         // Reset both icons to hidden state
         await Promise.all([
@@ -72,6 +126,11 @@ export const StatefullButton = ({
           ),
           animate(
             ".check",
+            { width: 0, scale: 0, opacity: 0 },
+            { duration: 0.1 }
+          ),
+          animate(
+            ".xmark",
             { width: 0, scale: 0, opacity: 0 },
             { duration: 0.1 }
           ),
@@ -92,15 +151,24 @@ export const StatefullButton = ({
           "opacity-75 cursor-not-allowed": isLoading,
         }
       )}
-      disabled={isLoading || props.disabled}
+      disabled={isLoading || props.disabled || isSuccess}
       {...props}
     >
       <div className="flex items-center gap-2">
         <Loader />
         <CheckIcon />
-        <span>{children}</span>
+        <XMarkIcon />
+        <span>{isLoading ? "Loading..." : children}</span>
       </div>
     </motion.button>
+  );
+};
+
+const XMarkIcon = () => {
+  return (
+    <motion.div className="xmark " initial={{ width: 0, scale: 0, opacity: 0 }}>
+      <XCircleIcon className="text-red-500" size={20} />
+    </motion.div>
   );
 };
 

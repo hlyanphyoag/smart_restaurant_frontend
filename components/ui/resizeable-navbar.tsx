@@ -235,10 +235,11 @@ export const MobileNavToggle = ({
 export const NavbarLogo = () => {
   return (
     <a
-      href="#"
+      href="/"
       className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-black"
     >
       <Icon size={40} className="text-green-400" iconNode={bowlChopsticks}/>
+    
       <span className="font-medium text-green-400 dark:text-white">Smart Restaurant</span>
     </a>
   );

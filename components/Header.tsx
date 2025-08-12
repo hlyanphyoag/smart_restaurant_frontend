@@ -36,6 +36,7 @@ import { redirect, useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { notiStore } from "@/store/StatusStore";
 import CheckOutCard from "@/app/(home)/component/CheckOutCard";
+import ProfilePicture from "./ui/ProfilePicture";
 
 export function Header({ user }: { user: User }) {
   const router = useRouter();
@@ -132,15 +133,15 @@ export function Header({ user }: { user: User }) {
             )}
             <DropdownMenu>
               <DropdownMenuTrigger className="cursor-pointer">
-                <NavbarButton
-                  variant="secondary"
-                  className="rounded-full flex items-center justify-center text-lg border h-12 w-12 border-neutral-100 bg-green-400 text-white"
-                >
-                  {user?.name[0]}
-                </NavbarButton>
+                <ProfilePicture name={user.name} />
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="end">
-                <DropdownMenuItem className="cursor-pointer text-gray-600 flex items-center justify-start">
+                <DropdownMenuItem
+                  onClick={() => {
+                    router.push("/profile");
+                  }}
+                  className="cursor-pointer text-gray-600 flex items-center justify-start"
+                >
                   <User2Icon size={28} />
                   Profile
                 </DropdownMenuItem>
@@ -172,10 +173,10 @@ export function Header({ user }: { user: User }) {
           >
             <div className="flex w-full flex-col gap-4">
               <div className="flex  justify-between items-center">
-              <div className="border border-gray-400 p-3 rounded-full">
-                {user.name[0]}
-              </div>
-              <Button
+                <div className="border size-11 flex items-center justify-center border-gray-400 p-3 rounded-full">
+                  {user?.name ? user.name[0] : "U"}
+                </div>
+                <Button
                   className="relative"
                   onClick={() => {
                     router.push("/order-history");
@@ -189,10 +190,7 @@ export function Header({ user }: { user: User }) {
                     <span className="absolute top-0 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                   )}
                 </Button>
-                <Button
-                  variant='secondary'
-                  onClick={handleLogout}
-                >
+                <Button variant="secondary" onClick={handleLogout}>
                   <LogOutIcon size={20} />
                   <small>Logout</small>
                 </Button>

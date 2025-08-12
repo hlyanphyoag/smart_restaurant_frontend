@@ -13,7 +13,7 @@ const OrderHistory = () => {
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-  } = useGetOrderHistoryQuery("COMPLETED", "3");
+  } = useGetOrderHistoryQuery("", "3");
 
 
   const readyOrderData = OrderData?.pages?.flatMap((page) => page.results);

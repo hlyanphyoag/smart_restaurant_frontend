@@ -1,39 +1,37 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import Lottie from "lottie-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardFooter,
-  CardAction,
-} from "@/components/ui/card";
+import NoFoodItems from "./NoFoodItems";
 import { Input } from "@/components/ui/input";
 import {
   useGetFoodQuery,
-  useGetMostOrderedFoodQuery,
   useGetPopularFood,
 } from "@/services/foodServices/food.query";
 import { useCartStore } from "@/store/CartStore";
 import { Food } from "@/types/food";
-import { Menu, Search } from "lucide-react";
-import Image from "next/image";
+import { Search } from "lucide-react";
 import React, { useState } from "react";
 import ScrollCard from "./ScrollCard";
 import ProductCard from "./ProductCard";
-import { add } from "date-fns";
+import Pagination from "./Pagination";
+import { useSearchParams } from "next/navigation";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const OrderCard = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const searchDebounce = useDebounce(searchQuery, 500);
+  const searchParams = useSearchParams();
+  const currentPage = parseInt(searchParams.get("page")!) || 1;
   const {
     data: foodData,
     isPending,
     isError,
-  } = useGetFoodQuery(searchQuery, "", "");
+  } = useGetFoodQuery(searchDebounce, currentPage.toString(), "10");
 
-  const { data: mostOrderedFood, isPending: isPopularPending, isError: isPopularError } = useGetPopularFood();
+  const {
+    data: mostOrderedFood,
+    isPending: isPopularPending,
+    isError: isPopularError,
+  } = useGetPopularFood();
   console.log("mostOrderedFood:", mostOrderedFood);
 
   const { addToCart } = useCartStore();
@@ -41,6 +39,7 @@ const OrderCard = () => {
   if (isError) {
     return <div>Error</div>;
   }
+
   return (
     <div className="flex flex-col  gap-6">
       <div className="flex justify-between">
@@ -69,33 +68,42 @@ const OrderCard = () => {
         <div className="flex flex-col gap-8">
           {!searchQuery && !isPopularPending && !isPopularError && (
             <div className="flex flex-col gap-8">
-            <ScrollCard
-              title="Top Order Menu"
-              items={mostOrderedFood!}
-              addToCart={addToCart}
-              description="Explore our popular menu"
-            />
+              <ScrollCard
+                title="Top Order Menu"
+                items={mostOrderedFood!}
+                addToCart={addToCart}
+                description="Explore our popular menu"
+              />
 
-            <ScrollCard
-              title="Recommended Menu"
-              items={mostOrderedFood!}
-              addToCart={addToCart}
-              description="Explore our popular menu"
-            />
-          </div>
+              <ScrollCard
+                title="Recommended Menu"
+                items={mostOrderedFood!}
+                addToCart={addToCart}
+                description="Explore our popular menu"
+              />
+            </div>
           )}
 
           <div>
             <h2 className="text-2xl font-semibold text-gray-600">All Menu</h2>
             <p className="text-md text-gray-600">Explore our all menu</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4  w-full xl:min-w-4xl mb-10">
-            {foodData?.results.map((food: Food, index: number) => {
-              return (
-                <ProductCard key={index} food={food} addToCart={addToCart} />
-              );
-            })}
-          </div>
+          {foodData?.results.length === 0 ? (
+            <NoFoodItems />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4  w-full xl:min-w-4xl mb-10">
+              {foodData?.results.map((food: Food, index: number) => {
+                return (
+                  <ProductCard key={index} food={food} addToCart={addToCart} />
+                );
+              })}
+            </div>
+          )}
+
+          <Pagination
+            totalPages={foodData.totalPages}
+            currentPage={currentPage}
+          />
         </div>
       )}
     </div>

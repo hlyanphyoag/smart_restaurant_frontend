@@ -1,10 +1,5 @@
 "use client";
 import { Loading } from "@/components/Loading";
-import {
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,8 +10,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { useGetOneOrderQuery } from "@/services/OrderServices/order.query";
-import { Food } from "@/types/food";
-import { ufo } from "@lucide/lab";
+import { useOrderUpdateStatusMutation } from "@/services/OrderServices/order.queryMutation";
 
 export const ViewOrderDetailsModal = ({ id }: { id: string }) => {
   const {
@@ -24,9 +18,23 @@ export const ViewOrderDetailsModal = ({ id }: { id: string }) => {
     isPending,
     isError,
   } = useGetOneOrderQuery(id);
+
+  console.log("OrderDetailsById:", orderDetailsById);
+
+  const { mutate: updateStatus, isPending: isLoading } =
+    useOrderUpdateStatusMutation();
+
+  const handleUpdateStatus = () => {
+    if (orderDetailsById?.status === "PENDING") {
+      updateStatus({ id: orderDetailsById.id, status: "ready" });
+    } else {
+      updateStatus({ id: orderDetailsById.id, status: "complete" });
+    }
+  };
+
   if (isPending) return <Loading />;
   if (isError) return <h2>Error</h2>;
-  console.log("OrderDetailsById:", orderDetailsById);
+
   return (
     <Card className="w-lg">
       <CardHeader>
@@ -162,6 +170,8 @@ export const ViewOrderDetailsModal = ({ id }: { id: string }) => {
             variant={
               orderDetailsById?.status === "PENDING" ? "customize" : "secondary"
             }
+            onClick={handleUpdateStatus}
+            disabled={isLoading || orderDetailsById?.status === "COMPLETED"}
             className="w-80"
           >
             {orderDetailsById?.status === "PENDING" ? "Confirm" : "Complete"}

@@ -24,7 +24,7 @@ const PendingCard = () => {
     (order: any) => order.status !== "COMPLETED"
   );
   console.log("Pending Order: ", pendingOrder);
-  const {notifications, setNotifications} = notiStore()
+  const { notifications, setNotifications } = notiStore();
 
   useEffect(() => {
     const active = pendingOrder?.status === "READY" ? true : false;
@@ -32,21 +32,22 @@ const PendingCard = () => {
       setTimeout(() => {
         setActiveReady(active);
         // setNotifications(pendingOrder)
-        console.log("PendingOrder:", pendingOrder)
+        console.log("PendingOrder:", pendingOrder);
       }, 1000);
-    }else{
-      console.log("Active error")
+    } else {
+      console.log("Active error");
     }
   }, [pendingOrder]);
 
-  console.log("Notification:", notifications)
+  console.log("Notification:", notifications);
 
-  return (
-    <div>
-      <h2 className="text-lg font-bold mb-4">Pending Order</h2>
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center gap-y-2">
-          {activeReady ? (
+  if (OrderHistoryData)
+    return (
+      <div>
+        <h2 className="text-lg font-bold mb-4">Pending Order</h2>
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center gap-y-2">
+            {activeReady ? (
               <div className="w-40 h-40">
                 <Lottie
                   animationData={require("@/public/success_mark.json")}
@@ -55,42 +56,44 @@ const PendingCard = () => {
                   size={100}
                 />
               </div>
-          ) : (
-            <AnimatedCircularProgressBar
-              max={100}
-              min={0}
-              value={
-                pendingOrder?.status === "PENDING"
-                  ? 25
-                  : pendingOrder?.status === "CONFIRMED"
-                  ? 50
-                  : pendingOrder?.status === "READY"
-                  ? 100
-                  : 75
-              }
-              gaugePrimaryColor="#2563eb"
-              gaugeSecondaryColor="#d1d5db"
-            />
-          )  }
-          <h2 className="text-lg font-bold">
-            Your Order is{" "}
-            {pendingOrder?.status === "PENDING"
-              ? "Pending"
-              : pendingOrder?.status === "CONFIRMED"
-              ? "Confirmed"
-              : pendingOrder?.status === "READY"
-              ? "Ready"
-              : "in Progress"}
-            !
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Your order is currently being prepared. Please wait for it to be
-            ready.
-          </p>
-        </CardContent>
-      </Card>
-    </div>
-  );
+            ) : (
+              <AnimatedCircularProgressBar
+                max={100}
+                min={0}
+                value={
+                  pendingOrder.status === "PENDING"
+                    ? 10
+                    : pendingOrder.status === "CONFIRMED"
+                    ? 50
+                    : pendingOrder.status === "READY"
+                    ? 75
+                    : pendingOrder.status === "COMPLETED"
+                    ? 100
+                    : 25
+                }
+                gaugePrimaryColor="#2563eb"
+                gaugeSecondaryColor="#d1d5db"
+              />
+            )}
+            <h2 className="text-lg font-bold">
+              Your Order is{" "}
+              {pendingOrder?.status === "PENDING"
+                ? "Pending"
+                : pendingOrder?.status === "CONFIRMED"
+                ? "Confirmed"
+                : pendingOrder?.status === "READY"
+                ? "Ready"
+                : "in Progress"}
+              !
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Your order is currently being prepared. Please wait for it to be
+              ready.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
 };
 
 export default PendingCard;
