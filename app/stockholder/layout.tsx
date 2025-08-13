@@ -5,6 +5,8 @@ import { User } from "@/types/user";
 import { Toaster } from "sonner";
 import { useSession } from "next-auth/react";
 import { Loading } from "@/components/Loading";
+import { useAuthStore } from "@/store/AuthStore";
+import { useEffect } from "react";
 
 export default function StockholderLayout({
   children,
@@ -12,15 +14,23 @@ export default function StockholderLayout({
   children: React.ReactNode;
 }) {
   const session = useSession();
+  const { setAuthUser, authUser } = useAuthStore();
+
+  useEffect(() => {
+    if (session.data) {
+      setAuthUser(session.data.user as User);
+    }
+  }, [session.data]);
+
   if (session.status === "loading") {
     return <Loading />;
   }
 
-  if (session.data)
+  if (authUser)
     return (
       <div>
         <Toaster />
-        <Header user={session?.data?.user as User} />
+        <Header />
         {children}
       </div>
     );

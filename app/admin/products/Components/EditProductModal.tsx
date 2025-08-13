@@ -1,4 +1,5 @@
 import {
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
@@ -9,11 +10,18 @@ import { useGetFoodByIdQuery } from "@/services/foodServices/food.query";
 import { usePatchFoodMutation } from "@/services/foodServices/food.mutation";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { XIcon } from "lucide-react";
 
-const EditProductModal = ({ id, onClose }: { id: string, onClose: () => void }) => {
+const EditProductModal = ({
+  id,
+  onClose,
+}: {
+  id: string;
+  onClose: () => void;
+}) => {
   const { data: foodDefaultValues } = useGetFoodByIdQuery(id);
   console.log("FoodDefaultValues:", foodDefaultValues);
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const {
     mutate: patchFoodMutation,
@@ -43,14 +51,14 @@ const EditProductModal = ({ id, onClose }: { id: string, onClose: () => void }) 
         {
           onSuccess: (data) => {
             console.log("Success:", data);
-            onClose()
+            onClose();
             toast.success("Food Item Updated Successfully");
             queryClient.invalidateQueries({
               queryKey: ["getAllFood"],
             });
             queryClient.invalidateQueries({
-              queryKey: ["getFoodById", id]
-            })
+              queryKey: ["getFoodById", id],
+            });
             return { success: true };
           },
           onError: (err) => {
@@ -64,7 +72,13 @@ const EditProductModal = ({ id, onClose }: { id: string, onClose: () => void }) 
   };
   return (
     <AlertDialogContent className="max-h-[80vh] overflow-y-auto">
-      <AlertDialogTitle>Edit Product</AlertDialogTitle>
+      <div className="flex justify-between items-center">
+        <AlertDialogTitle>Edit Product</AlertDialogTitle>
+        <AlertDialogCancel>
+          <XIcon />
+        </AlertDialogCancel>
+      </div>
+
       <FoodForm
         schema={foodSchema}
         defaultValues={foodDefaultValues}

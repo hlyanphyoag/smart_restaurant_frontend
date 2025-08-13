@@ -37,9 +37,11 @@ import { Button } from "./ui/button";
 import { notiStore } from "@/store/StatusStore";
 import CheckOutCard from "@/app/(home)/component/CheckOutCard";
 import ProfilePicture from "./ui/ProfilePicture";
+import { useAuthStore } from "@/store/AuthStore";
 
-export function Header({ user }: { user: User }) {
+export function Header() {
   const router = useRouter();
+  const { logout, authUser } = useAuthStore();
   const { notifications, removeNotification } = notiStore();
 
   const navItems = [
@@ -59,10 +61,11 @@ export function Header({ user }: { user: User }) {
     await signOut({
       redirect: false,
     });
+    logout();
     return redirect("/sign-in");
   };
 
-  console.log("User from Header:", user?.role);
+  console.log("User from Header:", authUser?.role);
 
   return (
     <div className="relative w-full p-4">
@@ -71,7 +74,7 @@ export function Header({ user }: { user: User }) {
         <NavBody>
           <NavbarLogo />
           <div className="flex items-center gap-4">
-            {user?.role === "CUSTOMER" && (
+            {authUser?.role === "CUSTOMER" && (
               <div className="flex items-center gap-2">
                 <Button
                   className="relative"
@@ -102,7 +105,7 @@ export function Header({ user }: { user: User }) {
                 </div> */}
               </div>
             )}
-            {user?.role === "CASHIER" && (
+            {authUser?.role === "CASHIER" && (
               <div className="flex items-center gap-2">
                 <Button
                   onClick={() => router.push("/cashier/pos/")}
@@ -113,7 +116,7 @@ export function Header({ user }: { user: User }) {
                 </Button>
               </div>
             )}
-            {user?.role === "STOCKHOLDER" && (
+            {authUser?.role === "STOCKHOLDER" && (
               <div className="flex items-center gap-2">
                 <Button
                   onClick={() => router.push("/stockholder/add-ingredient")}
@@ -133,7 +136,10 @@ export function Header({ user }: { user: User }) {
             )}
             <DropdownMenu>
               <DropdownMenuTrigger className="cursor-pointer">
-                <ProfilePicture name={user.name} />
+                <ProfilePicture
+                  name={authUser?.name}
+                  imageURL={authUser?.profilePic!}
+                />
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="end">
                 <DropdownMenuItem
@@ -174,7 +180,7 @@ export function Header({ user }: { user: User }) {
             <div className="flex w-full flex-col gap-4">
               <div className="flex  justify-between items-center">
                 <div className="border size-11 flex items-center justify-center border-gray-400 p-3 rounded-full">
-                  {user?.name ? user.name[0] : "U"}
+                  {authUser?.name ? authUser.name[0] : "U"}
                 </div>
                 <Button
                   className="relative"
@@ -196,9 +202,6 @@ export function Header({ user }: { user: User }) {
                 </Button>
               </div>
 
-              <div>
-                <h1 className="text-md font-semibold">Your Cart</h1>
-              </div>
               <CheckOutCard />
             </div>
           </MobileNavMenu>

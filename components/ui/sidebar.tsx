@@ -172,13 +172,14 @@ export const SidebarLink = ({
   const { open, animate } = useSidebar();
   const pathName = usePathname();
   const isActive = pathName === route;
-  
+
   return (
     <Link
       href={route}
       className={cn(
         "flex items-center justify-start gap-2 rounded-lg  py-4  group/sidebar  w-60 px-4 transition duration-150 ease-in-out",
-        isActive && "bg-green-200 border-l-5 border-green-500 dark:bg-green-500",
+        isActive &&
+          "bg-green-200 border-l-5 border-green-500 dark:bg-green-500",
         // !isActive && "hover:bg-green-100 cursor-pointer",
         className
       )}
@@ -191,11 +192,9 @@ export const SidebarLink = ({
         }}
         className="text-neutral-700 inline-flex items-center justify-center gap-3 dark:text-neutral-200 text-sm font-medium group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre !p-0 !m-0"
       >
-        <div className={cn("text-neutral-500")}>
-          {<Icon />}
-      </div>
+        <div className={cn("text-neutral-500")}>{<Icon />}</div>
         {text}
       </motion.span>
     </Link>
   );
-}
+};
