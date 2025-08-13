@@ -179,9 +179,10 @@ export function Header() {
           >
             <div className="flex w-full flex-col gap-4">
               <div className="flex  justify-between items-center">
-                <div className="border size-11 flex items-center justify-center border-gray-400 p-3 rounded-full">
-                  {authUser?.name ? authUser.name[0] : "U"}
-                </div>
+                <ProfilePicture
+                  name={authUser?.name}
+                  imageURL={authUser?.profilePic!}
+                />
                 <Button
                   className="relative"
                   onClick={() => {
