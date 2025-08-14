@@ -7,30 +7,35 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useOrderMutation } from "@/services/OrderServices/order.queryMutation";
+import { useAuthStore } from "@/store/AuthStore";
 import { useCartStore } from "@/store/CartStore";
 import { PaymentMethod } from "@/types/order";
 import { IconCash } from "@tabler/icons-react";
 import { CardSim } from "lucide-react";
-import { useSession } from "next-auth/react";
 import {
   useParams,
   usePathname,
   useRouter,
   useSearchParams,
 } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
+import { QRCodeCanvas } from "qrcode.react";
 
-const PaymentModal = () => {
+const PaymentModal = ({
+  setOpen,
+}: {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   const { id: tableId } = useParams();
   const { cart, GrandTotalPrice, removeAllCart } = useCartStore();
   const router = useRouter();
   const searchParams = useSearchParams();
   const address = searchParams.get("address");
-  const posRoute = usePathname();
+  const routename = usePathname();
+  const isPosRoute = routename.includes("/cashier/pos");
+  const { authUser } = useAuthStore();
   // console.log("posRoute:", posRoute
-
-  const { data: session } = useSession();
 
   const { mutate: postOrder } = useOrderMutation();
 
@@ -38,7 +43,7 @@ const PaymentModal = () => {
     postOrder(
       {
         tableId: tableId as string,
-        customerId: session?.user?.id!,
+        customerId: authUser?.id!,
         payment_method: paymentMethod,
         totalCost: Number(GrandTotalPrice()),
         orderItems: cart?.map((item: any) => {
@@ -54,12 +59,20 @@ const PaymentModal = () => {
         onSuccess: (data) => {
           toast.success("Order placed successfully!");
           removeAllCart();
-          if (posRoute === "/cashier/pos") {
-            router.push("/cashier");
-          } else if (paymentMethod === "CASH") {
-            router.push(`/success/${data.id}`);
-          } else if (paymentMethod === "DIGITAL" && data.bill) {
-            window.open(data.stripeUrl!, "_blank");
+          if (isPosRoute) {
+            if (paymentMethod === "DIGITAL") {
+              router.push(`/success/${data.id}`);
+            } else {
+              setOpen(false);
+              router.replace(`/cashier/pos`);
+            }
+          } else {
+            if (paymentMethod === "CASH") {
+              router.push(`/success/${data.id}`);
+            } else if (paymentMethod === "DIGITAL" && data.bill) {
+              window.open(data.stripeUrl!, "_blank");
+            }
+            setOpen(false);
           }
 
           console.log("OrderSuccess:", data);
@@ -109,6 +122,7 @@ const PaymentModal = () => {
       <DialogDescription className="text-gray-500 font-medium text-base mb-6 text-center">
         Choose your payment method below.
       </DialogDescription>
+
       <div className="flex flex-col sm:flex-row justify-center items-center gap-4 w-full">
         {!address && (
           <Button
@@ -126,14 +140,13 @@ const PaymentModal = () => {
           variant="ready_order"
           onClick={() => handleSubmit("DIGITAL")}
           className="flex items-center gap-2 px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow transition-all focus:ring-2 focus:ring-blue-300 focus:outline-none w-full sm:w-auto"
-          aria-label={
-            posRoute === "/cashier/pos" ? "Generate Qr" : "Pay with Digital"
-          }
+          aria-label={isPosRoute ? "Generate Qr" : "Pay with Digital"}
         >
           <CardSim size={22} />
-          {posRoute === "/cashier/pos" ? "Generate QR" : "Pay with Digital"}
+          {isPosRoute ? "Generate QR" : "Pay with Digital"}
         </Button>
       </div>
+
       <div className="mt-6 w-full flex justify-center">
         <DialogClose asChild>
           <button

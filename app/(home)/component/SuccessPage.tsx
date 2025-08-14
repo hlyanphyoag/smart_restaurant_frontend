@@ -8,6 +8,7 @@ import Lottie from "lottie-react";
 import { IndentIcon } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
+import { QRCodeCanvas } from "qrcode.react";
 
 const SuccessPage = () => {
   const router = useRouter();
@@ -33,6 +34,14 @@ const SuccessPage = () => {
     );
   }
 
+  const isCashierOrder = OrderData?.customer?.role === "CASHIER";
+  const isDigitalPayment = OrderData?.bill?.paymentMethod === "DIGITAL";
+  const showQRCode =
+    isCashierOrder &&
+    isDigitalPayment &&
+    OrderData?.bill?.stripeUrl &&
+    !OrderData?.bill?.paid;
+
   return (
     <div className="flex flex-col items-center justify-center mb-10">
       <div className="w-40 h-40">
@@ -53,6 +62,27 @@ const SuccessPage = () => {
           Your delicious meal is being prepared!
         </small>
       </div>
+
+      {showQRCode && (
+        <Card className="w-full max-w-md mt-6">
+          <CardHeader>
+            <CardTitle>Payment QR Code</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center">
+            <div className="p-4 bg-white rounded-lg">
+              <QRCodeCanvas
+                value={OrderData.bill.stripeUrl}
+                size={256}
+                level={"H"}
+                includeMargin={true}
+              />
+            </div>
+            <p className="mt-4 text-sm text-gray-600 text-center">
+              Scan this QR code to complete your payment
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="w-full mt-6">
         <CardHeader className="flex items-center justify-between">
@@ -97,7 +127,6 @@ const SuccessPage = () => {
             </div>
           </div>
           <div className="flex flex-col gap-y-2">
-            {/* <h2 className='text-lg mb-2 font-semibold text-gray-600'>Your Items</h2> */}
             {OrderData?.items?.map((item: any, index: number) => (
               <div
                 className="flex flex-col bg-neutral-100 p-4 rounded-2xl"

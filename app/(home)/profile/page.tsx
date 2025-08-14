@@ -17,14 +17,15 @@ import { api } from "@/services/api";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/AuthStore";
 import { User } from "@/types/user";
+import { useSession } from "next-auth/react";
 
 type UpdateUserData = {
   name?: string;
   profilePic?: string | null;
-  phone?: string | null;
 };
 
 const ProfilePage = () => {
+  const { update } = useSession();
   const { authUser, setAuthUser } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<UpdateUserData>({
@@ -52,6 +53,8 @@ const ProfilePage = () => {
       return res.data;
     },
     onSuccess: (data) => {
+      console.log("updated profile", data);
+      update({ user: { ...data } });
       setAuthUser(data);
       toast.success("Profile updated successfully");
       setIsEditing(false);
@@ -140,9 +143,9 @@ const ProfilePage = () => {
                 <div className="flex-shrink-0 flex flex-col items-center justify-center gap-2">
                   <div className="relative group">
                     <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full bg-green-100 flex items-center justify-center overflow-hidden border-4 border-green-400 shadow-lg sm:shadow-xl transition-all group-hover:ring-4 group-hover:ring-green-300">
-                      {authUser.profilePic ? (
+                      {formData.profilePic || authUser.profilePic ? (
                         <img
-                          src={authUser.profilePic}
+                          src={formData.profilePic! || authUser.profilePic!}
                           alt={authUser.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                         />

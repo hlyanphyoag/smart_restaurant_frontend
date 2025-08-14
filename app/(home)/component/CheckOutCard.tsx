@@ -26,7 +26,7 @@ const CheckOutCard = () => {
     removeFromCart,
   } = useCartStore();
 
-  console.log("Cart:", cart);
+  const [open, setOpen] = useState(false);
 
   return (
     <Card className="min-w-xs col-span-2 shadow-lg border-2 border-gray-100 rounded-2xl bg-white">
@@ -97,7 +97,7 @@ const CheckOutCard = () => {
               </span>
             </CardFooter>
             <div className="flex flex-col gap-2 mt-2">
-              <Dialog>
+              <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
                   <Button
                     disabled={cart.length === 0}
@@ -108,7 +108,7 @@ const CheckOutCard = () => {
                     Checkout
                   </Button>
                 </DialogTrigger>
-                <PaymentModal />
+                <PaymentModal setOpen={setOpen} />
               </Dialog>
               <Button
                 variant="secondary"

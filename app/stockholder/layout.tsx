@@ -23,7 +23,6 @@ export default function StockholderLayout({
       setAuthUser(session.data?.user as User);
     }
     if (session.status === "unauthenticated") {
-      toast.error("You have to sign in first");
       router.replace("/sign-in");
     }
   }, [session.data, session.status, setAuthUser, router]);

@@ -8,6 +8,10 @@ import { format } from "date-fns";
 import { useSocketContext } from "@/provider/SocketContextProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { getOrderKey } from "@/services/OrderServices/order.queryKey";
+import { QRCodeCanvas } from "qrcode.react";
+import { Button } from "@/components/ui/button";
+import { Copy } from "lucide-react";
+import { toast } from "sonner";
 
 const getProgress = (status: string) => {
   switch (status) {
@@ -65,6 +69,13 @@ const OrderDetailPage = () => {
     };
   }, [order?.id]);
 
+  const handleCopyPaymentLink = () => {
+    if (order?.bill?.stripeUrl) {
+      navigator.clipboard.writeText(order.bill.stripeUrl);
+      toast.success("Payment link copied to clipboard!");
+    }
+  };
+
   if (isPending)
     return (
       <div className="flex justify-center items-center h-96">Loading...</div>
@@ -75,6 +86,9 @@ const OrderDetailPage = () => {
         Order not found.
       </div>
     );
+
+  const showPaymentOptions =
+    order.bill && !order.bill.paid && order.bill.stripeUrl;
 
   return (
     <div className="flex flex-col items-center min-h-screen py-10 px-2 bg-gradient-to-br from-white to-blue-50">
@@ -120,6 +134,53 @@ const OrderDetailPage = () => {
             </span>
           </div>
         </div>
+
+        {/* Payment Section (if not paid) */}
+        {showPaymentOptions && (
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 border border-blue-100">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Complete Your Payment
+            </h3>
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              <div className="p-4 bg-white rounded-lg border border-gray-200">
+                <QRCodeCanvas
+                  value={order.bill.stripeUrl}
+                  size={180}
+                  level={"H"}
+                  includeMargin={true}
+                />
+              </div>
+              <div className="flex-1 flex flex-col gap-4">
+                <p className="text-sm text-gray-600">
+                  Scan the QR code or click the button below to complete your
+                  payment.
+                </p>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    asChild
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <a
+                      href={order.bill.stripeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Pay Now
+                    </a>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleCopyPaymentLink}
+                    className="flex items-center gap-2"
+                  >
+                    <Copy size={16} />
+                    Copy Payment Link
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Order Info Section */}
         <div className="bg-white rounded-2xl shadow p-6 mb-6 border border-gray-100">

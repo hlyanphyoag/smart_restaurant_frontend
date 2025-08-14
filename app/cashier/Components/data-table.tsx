@@ -16,7 +16,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { mkConfig, generateCsv, download } from 'export-to-csv'
+import { mkConfig, generateCsv, download } from "export-to-csv";
 import {
   Table,
   TableBody,
@@ -29,11 +29,12 @@ import { DataTablePagination } from "./tablePagination";
 import { useTableStore } from "@/store/TableStore";
 import { useStatusStore } from "@/store/StatusStore";
 import { usePathname } from "next/navigation";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface DataTableProps<TData, TValue> {
   totalElements: number;
   totalPages: number;
-  columns: ColumnDef<TData, TValue>[]; 
+  columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 export function DataTable<TData, TValue>({
@@ -87,19 +88,19 @@ export function DataTable<TData, TValue>({
   });
 
   const csvConfig = mkConfig({
-    fieldSeparator: ',',
-    filename: 'sample', // export file name (without .csv)
-    decimalSeparator: '.',
+    fieldSeparator: ",",
+    filename: "sample", // export file name (without .csv)
+    decimalSeparator: ".",
     useKeysAsHeaders: true,
-  })
-  
+  });
+
   // export function
   // Note: change _ in Row<_>[] with your Typescript type.
   const exportExcel = (rows: Row<any>[]) => {
-    const rowData = rows.map((row) => row.original)
-    const csv = generateCsv(csvConfig)(rowData)
-    download(csvConfig)(csv)
-  }
+    const rowData = rows.map((row) => row.original);
+    const csv = generateCsv(csvConfig)(rowData);
+    download(csvConfig)(csv);
+  };
 
   const pathName = usePathname();
 
@@ -115,7 +116,7 @@ export function DataTable<TData, TValue>({
           Orders ( {totalElements} )
         </h2> */}
         <Input
-          placeholder="Filter customer..."
+          placeholder="Search..."
           value={globalFilter ?? ""}
           onChange={(e) => setGlobalFilter(e.target.value)}
           className="max-w-sm"
