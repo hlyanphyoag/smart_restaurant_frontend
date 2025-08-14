@@ -25,7 +25,7 @@ const OrderCard = () => {
     data: foodData,
     isPending,
     isError,
-  } = useGetFoodQuery(searchDebounce, currentPage.toString(), "2");
+  } = useGetFoodQuery(searchDebounce, currentPage.toString(), "10");
 
   const {
     data: mostOrderedFood,
