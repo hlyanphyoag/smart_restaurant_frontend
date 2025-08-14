@@ -13,14 +13,25 @@ import { Button } from "@/components/ui/button";
 import { Copy } from "lucide-react";
 import { toast } from "sonner";
 
+//   PENDING
+//   CONFIRMED
+//   WAITING_FOR_INGREDIENTS
+//   INGREDIENTS_APPROVED
+//   READY
+//   COMPLETED
+
 const getProgress = (status: string) => {
   switch (status) {
     case "PENDING":
       return 10;
     case "CONFIRMED":
-      return 50;
+      return 30;
+    case "WAITING_FOR_INGREDIENTS":
+      return 45;
+    case "INGREDIENTS_APPROVED":
+      return 60;
     case "READY":
-      return 75;
+      return 85;
     case "COMPLETED":
       return 100;
     default:
@@ -34,6 +45,10 @@ const getStatusLabel = (status: string) => {
       return "Pending";
     case "CONFIRMED":
       return "Confirmed";
+    case "WAITING_FOR_INGREDIENTS":
+      return "Waiting for Ingredients";
+    case "INGREDIENTS_APPROVED":
+      return "Ingredients Approved";
     case "READY":
       return "Ready";
     case "COMPLETED":

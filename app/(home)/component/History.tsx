@@ -1,3 +1,42 @@
+// ...existing imports...
+// Status helpers from order-history page
+const getProgress = (status: string) => {
+  switch (status) {
+    case "PENDING":
+      return 10;
+    case "CONFIRMED":
+      return 30;
+    case "WAITING_FOR_INGREDIENTS":
+      return 45;
+    case "INGREDIENTS_APPROVED":
+      return 60;
+    case "READY":
+      return 85;
+    case "COMPLETED":
+      return 100;
+    default:
+      return 25;
+  }
+};
+
+const getStatusLabel = (status: string) => {
+  switch (status) {
+    case "PENDING":
+      return "Pending";
+    case "CONFIRMED":
+      return "Confirmed";
+    case "WAITING_FOR_INGREDIENTS":
+      return "Waiting for Ingredients";
+    case "INGREDIENTS_APPROVED":
+      return "Ingredients Approved";
+    case "READY":
+      return "Ready";
+    case "COMPLETED":
+      return "Completed";
+    default:
+      return "Progress";
+  }
+};
 import { Loading } from "@/components/Loading";
 import { SkeletonCard } from "@/components/SkeletonCard";
 import { Button } from "@/components/ui/button";
@@ -87,13 +126,7 @@ const HistoryPage = ({
                   </div>
                   <div className="flex gap-x-2 items-center">
                     <Badge variant="outline" className="text-xs">
-                      {order.status === "READY"
-                        ? "Ready"
-                        : order.status === "PENDING"
-                        ? "Pending"
-                        : order.status === "COMPLETED"
-                        ? "Complete"
-                        : "Progress"}
+                      {getStatusLabel(order.status)}
                     </Badge>
                     {order.bill && (
                       <Badge
@@ -145,31 +178,13 @@ const HistoryPage = ({
                       max={100}
                       min={0}
                       fontSize="text-sm"
-                      value={
-                        order.status === "PENDING"
-                          ? 10
-                          : order.status === "CONFIRMED"
-                          ? 50
-                          : order.status === "READY"
-                          ? 75
-                          : order.status === "COMPLETED"
-                          ? 100
-                          : 25
-                      }
+                      value={getProgress(order.status)}
                       gaugePrimaryColor="#2563eb"
                       gaugeSecondaryColor="#d1d5db"
                       className="w-12 h-12"
                     />
                     <span className="text-xs mt-1">
-                      {order.status === "PENDING"
-                        ? "Pending"
-                        : order.status === "CONFIRMED"
-                        ? "Confirmed"
-                        : order.status === "READY"
-                        ? "Ready"
-                        : order.status === "COMPLETED"
-                        ? "Completed"
-                        : "Progress"}
+                      {getStatusLabel(order.status)}
                     </span>
                   </div>
                   <div className="flex flex-col items-end">
