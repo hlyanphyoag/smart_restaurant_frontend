@@ -11,7 +11,7 @@ import Lottie from 'lottie-react'
 const AdminOrders = () => {
     const {pageIndex, pageSize} = useTableStore()
     const {status} = useStatusStore()
-    const {data: OrderData, isPending, isError } = useGetAllOrderQuery(status, pageSize.toString(), (pageIndex + 1).toString())
+    const {data: OrderData, isPending, isError } = useGetAllOrderQuery("COMPLETED", pageSize.toString(), (pageIndex + 1).toString())
 
     if (isPending) return <div className="flex items-center justify-center">
     <div className="h-60 w-60">

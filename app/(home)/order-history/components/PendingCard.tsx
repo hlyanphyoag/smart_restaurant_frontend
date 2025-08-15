@@ -65,9 +65,9 @@ const PendingCard = () => {
                     ? 10
                     : pendingOrder.status === "CONFIRMED"
                     ? 50
-                    : pendingOrder.status === "READY"
+                    : pendingOrder.status === "WAITING_FOR_INGREDIENTS" || pendingOrder.status === "INGREDIENTS_APPROVED"
                     ? 75
-                    : pendingOrder.status === "COMPLETED"
+                    : pendingOrder.status === "READY" || pendingOrder.status === "COMPLETED"
                     ? 100
                     : 25
                 }

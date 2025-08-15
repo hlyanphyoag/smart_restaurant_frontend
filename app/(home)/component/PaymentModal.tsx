@@ -18,9 +18,9 @@ import {
   useRouter,
   useSearchParams,
 } from "next/navigation";
-import React, { useState } from "react";
+import React from "react";
 import { toast } from "sonner";
-import { QRCodeCanvas } from "qrcode.react";
+import { motion } from "framer-motion";
 
 const PaymentModal = ({
   setOpen,
@@ -35,8 +35,6 @@ const PaymentModal = ({
   const routename = usePathname();
   const isPosRoute = routename.includes("/cashier/pos");
   const { authUser } = useAuthStore();
-  // console.log("posRoute:", posRoute
-
   const { mutate: postOrder } = useOrderMutation();
 
   const handleSubmit = (paymentMethod: PaymentMethod) => {
@@ -46,13 +44,11 @@ const PaymentModal = ({
         customerId: authUser?.id!,
         payment_method: paymentMethod,
         totalCost: Number(GrandTotalPrice()),
-        orderItems: cart?.map((item: any) => {
-          return {
-            foodItemId: item.id,
-            quantity: item.quantity,
-            note: item.note,
-          };
-        }),
+        orderItems: cart?.map((item: any) => ({
+          foodItemId: item.id,
+          quantity: item.quantity,
+          note: item.note,
+        })),
         address: address ? address : "",
       },
       {
@@ -74,89 +70,78 @@ const PaymentModal = ({
             }
             setOpen(false);
           }
-
-          console.log("OrderSuccess:", data);
         },
         onError: (error) => {
-          console.log("OrderError:", error);
           toast.error("Failed to place order. Please try again.");
         },
       }
     );
   };
 
-  // const handlePayWithStripe = () => {
-  //   stripeMutation(orderId, {
-  //     onSuccess: (StripeData) => {
-  //       console.log("StripeSuccess:", StripeData.url);
-  //       window.location.href = StripeData.url;
-  //       return;
-  //     },
-  //     onError: (error) => {
-  //       console.log("StripeError_really:", error);
-  //     },
-  //   });
-  // };
-
-  // const OrderByCashier = () => {
-  //   orderByCashierMutation({id: orderId}, {
-  //     onSuccess: (data)=> {
-  //       console.log("OrderByCashierSuccess:", data)
-  //       toast.success("Hey Cashier, your order is success!")
-  //       router.push("/cashier")
-  //     },
-  //     onError: (error) => {
-  //       console.log("OrderByCashierError:", error)
-  //       toast.error("Hey Cashier, your order is failed!")
-  //     }
-  //   })
-  // }
-
   return (
-    <DialogContent className="flex flex-col items-center justify-center p-8 rounded-2xl shadow-lg bg-white min-w-[340px]">
-      <DialogHeader className="w-full text-center mb-2">
-        <DialogTitle className="text-2xl font-bold tracking-tight text-gray-800">
-          Payment
-        </DialogTitle>
-      </DialogHeader>
-      <DialogDescription className="text-gray-500 font-medium text-base mb-6 text-center">
-        Choose your payment method below.
-      </DialogDescription>
+    <DialogContent className="p-6 sm:p-8 rounded-2xl bg-white/90 backdrop-blur-lg shadow-xl max-w-md w-full border border-gray-100/50">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+      >
+        <DialogHeader className="text-center mb-4">
+          <DialogTitle className="text-2xl font-semibold text-gray-800 tracking-tight">
+            Complete Your Payment
+          </DialogTitle>
+          <DialogDescription className="text-gray-500 text-sm mt-2">
+            Select a payment method to finalize your order.
+          </DialogDescription>
+        </DialogHeader>
 
-      <div className="flex flex-col sm:flex-row justify-center items-center gap-4 w-full">
-        {!address && (
-          <Button
-            type="button"
-            variant="request_ingredients"
-            onClick={() => handleSubmit("CASH")}
-            className="flex items-center gap-2 px-6 py-3 rounded-lg bg-green-500 hover:bg-green-600 text-white font-semibold shadow transition-all focus:ring-2 focus:ring-green-300 focus:outline-none w-full sm:w-auto"
-            aria-label="Pay with Cash"
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-6">
+          {!address && (
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-full sm:w-auto"
+            >
+              <Button
+                type="button"
+                variant="request_ingredients"
+                onClick={() => handleSubmit("CASH")}
+                className="w-full flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl font-medium shadow-lg transition-all duration-300 ease-in-out"
+                aria-label="Pay with Cash"
+              >
+                <IconCash size={24} />
+                <span>Pay with Cash</span>
+              </Button>
+            </motion.div>
+          )}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="w-full sm:w-auto"
           >
-            <IconCash size={22} />
-            <span>Pay with Cash</span>
-          </Button>
-        )}
-        <Button
-          variant="ready_order"
-          onClick={() => handleSubmit("DIGITAL")}
-          className="flex items-center gap-2 px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow transition-all focus:ring-2 focus:ring-blue-300 focus:outline-none w-full sm:w-auto"
-          aria-label={isPosRoute ? "Generate Qr" : "Pay with Digital"}
-        >
-          <CardSim size={22} />
-          {isPosRoute ? "Generate QR" : "Pay with Digital"}
-        </Button>
-      </div>
+            <Button
+              variant="ready_order"
+              onClick={() => handleSubmit("DIGITAL")}
+              className="w-full flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-medium shadow-lg transition-all duration-300 ease-in-out"
+              aria-label={isPosRoute ? "Generate QR" : "Pay with Digital"}
+            >
+              <CardSim size={24} />
+              {isPosRoute ? "Generate QR" : "Pay with Digital"}
+            </Button>
+          </motion.div>
+        </div>
 
-      <div className="mt-6 w-full flex justify-center">
-        <DialogClose asChild>
-          <button
-            className="text-gray-400 hover:text-gray-600 text-sm underline transition-all"
-            aria-label="Close Payment Modal"
-          >
-            Cancel
-          </button>
-        </DialogClose>
-      </div>
+        <div className="mt-6 flex justify-center">
+          <DialogClose asChild>
+            <motion.button
+              whileHover={{ color: "#1f2937" }}
+              className="text-gray-400 text-sm font-medium underline hover:text-gray-600 transition-colors duration-200"
+              aria-label="Close Payment Modal"
+            >
+              Cancel
+            </motion.button>
+          </DialogClose>
+        </div>
+      </motion.div>
     </DialogContent>
   );
 };

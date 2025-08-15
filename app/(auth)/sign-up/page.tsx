@@ -54,9 +54,9 @@ const page = () => {
     });
   };
 
-  if (isPending) {
-    return <div>Loading...</div>;
-  }
+  // if (isPending) {
+  //   return <div>Loading...</div>;
+  // }
 
   return (
     <div className="flex h-screen items-center justify-center">

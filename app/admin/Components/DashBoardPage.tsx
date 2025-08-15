@@ -113,38 +113,66 @@ const DashboardPage = () => {
   });
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Dashboard Overview</h1>
-      <DashboardSummaryCards
-        summaryLoading={summaryLoading}
-        summaryError={summaryError}
-        summary={summary}
-      />
-      <TodayStatsCards
-        todayLoading={todayLoading}
-        todayError={todayError}
-        todaySummary={todaySummary}
-      />
-      <div className="flex gap-x-4  mt-6 mb-6">
-        <ChartLineDefault />
-        <ChartBarDefault />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Section */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent">
+              Dashboard Overview
+            </h1>
+            <p className="text-slate-600 mt-2 text-lg">
+              Monitor your restaurant's performance in real-time
+            </p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-sm text-slate-600 font-medium">Live Updates</span>
+          </div>
+        </div>
+
+        {/* Summary Cards */}
+        <DashboardSummaryCards
+          summaryLoading={summaryLoading}
+          summaryError={summaryError}
+          summary={summary}
+        />
+
+        {/* Today's Stats */}
+        <TodayStatsCards
+          todayLoading={todayLoading}
+          todayError={todayError}
+          todaySummary={todaySummary}
+        />
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          <ChartLineDefault />
+          <ChartBarDefault />
+        </div>
+
+        {/* Analytics Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <IncomeAnalytics
+            incomeLoading={incomeLoading}
+            incomeError={incomeError}
+            incomeData={incomeData}
+          />
+          <PaymentAnalytics
+            paymentLoading={paymentLoading}
+            paymentError={paymentError}
+            paymentData={paymentData}
+          />
+        </div>
+
+        {/* Popular Items */}
+        {todaySummary?.summary?.popularItems &&
+          todaySummary.summary.popularItems.length > 0 && (
+            <div className="backdrop-blur-sm bg-white/30 rounded-2xl border border-white/20 shadow-xl">
+              <PopularItemsToday popularItems={todaySummary.summary.popularItems} />
+            </div>
+          )}
       </div>
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <IncomeAnalytics
-          incomeLoading={incomeLoading}
-          incomeError={incomeError}
-          incomeData={incomeData}
-        />
-        <PaymentAnalytics
-          paymentLoading={paymentLoading}
-          paymentError={paymentError}
-          paymentData={paymentData}
-        />
-      </section>
-      {todaySummary?.summary?.popularItems &&
-        todaySummary.summary.popularItems.length > 0 && (
-          <PopularItemsToday popularItems={todaySummary.summary.popularItems} />
-        )}
     </div>
   );
 };

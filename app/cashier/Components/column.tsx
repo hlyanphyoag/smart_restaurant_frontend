@@ -109,7 +109,7 @@ export const columns: ColumnDef<any>[] = [
     accessorKey: "payment",
     header: "Payment",
     cell: ({ row }: any) => {
-      const { paymentMethod, paid } = row.original.bill;
+      const { paymentMethod, paid } = row?.original?.bill ?? {};
   
       const methodColor =
         paymentMethod === "CASH"
@@ -160,7 +160,12 @@ export const columns: ColumnDef<any>[] = [
             <Badge variant="secondary" className="bg-green-100 text-green-500">
               Completed
             </Badge>
-          ) : (
+          ) : status === "READY" ? (
+            <Badge variant="secondary" className="bg-green-100 text-green-500">
+              Ready
+            </Badge>
+          ) :
+           (
             <Badge
               variant="secondary"
               className="bg-yellow-100 text-yellow-500"
@@ -184,7 +189,7 @@ export const columns: ColumnDef<any>[] = [
       const { mutate: tableMutation } = useTableMutation();
       const { mutate: paymentStatusMutation } = usePaymentStatusMutation();
       const queryClient = useQueryClient();
-      console.log("Table:", row.original.table);
+      console.log("Table:", row.original?.table);
 
       const handleConfirmOrder = () => {
         confirmOrder(
@@ -270,7 +275,7 @@ export const columns: ColumnDef<any>[] = [
             }
             disabled={
               !(
-                row.original.status === "PENDING" ||
+                row.original.status === "PENDING" || row.original.status === "READY" ||
                 (row.original.status === "COMPLETED" &&
                   row.original.table.occupied === true)
               )
@@ -291,6 +296,7 @@ export const columns: ColumnDef<any>[] = [
               ? "Success"
               : row.original.status === "COMPLETED"
               ? "Complete"
+              : toComplete || row.original.status === "READY" ? "to Complete"
               : "Progress"}
           </Button>
         </div>

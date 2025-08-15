@@ -171,7 +171,7 @@ const HistoryPage = ({
                   </div>
                 ))}
               </CardContent>
-              <CardFooter>
+              {/* <CardFooter>
                 <div className="flex w-full items-center justify-between">
                   <div className="flex flex-col items-center justify-center">
                     <AnimatedCircularProgressBar
@@ -199,7 +199,7 @@ const HistoryPage = ({
                     </small>
                   </div>
                 </div>
-              </CardFooter>
+              </CardFooter> */}
             </Card>
           </Link>
         );

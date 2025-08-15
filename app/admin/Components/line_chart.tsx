@@ -63,85 +63,77 @@ export function ChartLineDefault() {
     const toDate = data[data.length - 1].date;
 
     return (
-      <Card className="shadow-xl rounded-xl border-none bg-gradient-to-br from-white via-slate-50 to-slate-100">
+      <Card className="shadow-sm rounded-xl border border-slate-200/50 bg-white/70 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg font-bold text-primary">
-            <TrendingUp className="h-6 w-6 text-green-500 animate-bounce" />
-            Completed Orders in 7 Days
+          <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-700">
+            <TrendingUp className="h-5 w-5 text-slate-500" />
+            Completed Orders - 7 Days
           </CardTitle>
           {data.length >= 2 && (
-            <CardDescription className="text-muted-foreground text-xs">
+            <CardDescription className="text-slate-500 text-sm">
               {format(new Date(fromDate), "MMM dd, yyyy")} to{" "}
               {format(new Date(toDate), "MMM dd, yyyy")}
             </CardDescription>
           )}
         </CardHeader>
         <CardContent>
-          <ChartContainer config={chartConfig} className="min-h-[240px]">
+          <ChartContainer config={chartConfig}>
             <LineChart
+              accessibilityLayer
               data={data}
-              margin={{ left: 12, right: 12, top: 20, bottom: 10 }}
+              margin={{
+                top: 20,
+                left: 12,
+                right: 12,
+                bottom: 12,
+              }}
             >
-              <defs>
-                <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#4f8cff" stopOpacity={0.8} />
-                  <stop offset="100%" stopColor="#a0e9ff" stopOpacity={0.2} />
-                </linearGradient>
-                <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#4f8cff" stopOpacity={0.2} />
-                  <stop offset="100%" stopColor="#a0e9ff" stopOpacity={0.05} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                vertical={false}
+              <CartesianGrid 
+                vertical={false} 
+                strokeOpacity={0.2}
                 stroke="#e2e8f0"
               />
               <XAxis
                 dataKey="day"
                 tickLine={false}
                 axisLine={false}
-                tickMargin={10}
-                tick={{ fontSize: 12, fill: "#64748b", fontWeight: 500 }}
-                tickFormatter={(value) => `${value.slice(0, 5)}...`}
+                tickMargin={8}
+                tick={{ fontSize: 11, fill: "#64748b" }}
+                tickFormatter={(value) => value.slice(0, 3)}
               />
               <ChartTooltip
-                cursor={{
-                  stroke: "#4f8cff",
-                  strokeWidth: 1,
-                  strokeDasharray: "4 2",
-                }}
-                content={<ChartTooltipContent hideLabel={false} />} // show label
+                cursor={false}
+                content={<ChartTooltipContent 
+                  hideLabel 
+                  className="rounded-lg border border-slate-200 bg-white/95 shadow-lg"
+                />}
               />
               <Line
                 dataKey="count"
                 type="monotone"
-                stroke="url(#lineGradient)"
-                strokeWidth={3}
+                stroke="#7dd3fc"
+                strokeWidth={2}
                 dot={{
-                  r: 5,
-                  stroke: "#4f8cff",
-                  strokeWidth: 2,
-                  fill: "#fff",
-                  className: "transition-all duration-300 hover:scale-110",
+                  fill: "#7dd3fc",
+                  r: 3,
+                  strokeWidth: 0,
                 }}
                 activeDot={{
-                  r: 7,
-                  fill: "#4f8cff",
-                  stroke: "#fff",
-                  strokeWidth: 2,
+                  r: 4,
+                  fill: "#0ea5e9",
+                  strokeWidth: 0,
                 }}
-                isAnimationActive={true}
+                className="opacity-80 hover:opacity-100 transition-opacity"
               />
             </LineChart>
           </ChartContainer>
         </CardContent>
         <CardFooter className="flex-col items-start gap-2 text-sm">
-          <div className="flex gap-2 leading-none font-medium text-green-600">
+          <div className="flex gap-2 font-medium leading-none text-slate-600">
             Trending up by 5.2% this week{" "}
-            <TrendingUp className="h-4 w-4 animate-pulse" />
+            <TrendingUp className="h-4 w-4" />
           </div>
-          <div className="text-muted-foreground leading-none">
+          <div className="leading-none text-slate-500">
             Showing completed orders for the last 7 days
           </div>
         </CardFooter>

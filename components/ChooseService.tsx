@@ -1,9 +1,9 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Box, ForkKnife, ShoppingBag } from "lucide-react";
+import { Box, ForkKnife, LocateIcon, MapPin, ShoppingBag, ChevronRight, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import {
   Dialog,
@@ -19,6 +19,7 @@ import { Input } from "./ui/input";
 
 const ChooseService = () => {
   const router = useRouter();
+  const [address, setAddress] = useState('');
 
   const addressRef = useRef<HTMLInputElement>(null);
   const handleLogout = async () => {
@@ -28,9 +29,9 @@ const ChooseService = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const address = addressRef.current?.value;
-    if (!address) return;
-    router.push(`/take-away?address=${address}`);
+    const addressValue = address || addressRef.current?.value;
+    if (!addressValue) return;
+    router.push(`/take-away?address=${addressValue}`);
   };
 
   return (
@@ -82,22 +83,66 @@ const ChooseService = () => {
                   Take Away
                 </Button>
               </DialogTrigger>
-              <DialogContent>
-                <DialogHeader className="flex flex-col gap-2">
-                  <DialogTitle className="text-xl font-bold">
-                    Take Away
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-500">
-                    Order ahead and collect when ready
-                  </DialogDescription>
+              <DialogContent className="max-w-md">
+                {/* Enhanced Dialog Header */}
+                <DialogHeader className="border-b border-gray-100 pb-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                      <MapPin className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <div className="text-left">
+                      <DialogTitle className="text-xl font-bold text-gray-900">
+                        Delivery Location
+                      </DialogTitle>
+                      <DialogDescription className="text-sm text-gray-500">
+                        Where should we deliver your order?
+                      </DialogDescription>
+                    </div>
+                  </div>
                 </DialogHeader>
-                <Input ref={addressRef} placeholder="Enter your address" />
-                <DialogFooter>
+
+                {/* Enhanced Content */}
+                <div className="py-4 space-y-2">
+                  {/* Address Input */}
+                  <div className="flex flex-col space-y-4">
+                    <label className="text-sm font-medium text-gray-700">Enter your delivery address</label>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input
+                        ref={addressRef}
+                        type="text"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        placeholder="Street address, area, city..."
+                        className="pl-10 pr-4 py-5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Enhanced Footer */}
+                <DialogFooter className="border-t border-gray-100 pt-4 space-y-3 gap-2">
+                  <div className="flex flex-col gap-2 w-full">
                   <DialogClose asChild>
-                    <Button onClick={handleSubmit} variant="customize">
-                      Let's Select Food
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={!address.trim()}
+                      variant="customize"
+                      className="w-full py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    >
+                      Continue to Menu
+                      <ChevronRight className="w-4 h-4" />
                     </Button>
                   </DialogClose>
+                  
+                  {/* Delivery Info */}
+                  <div className="p-3 bg-green-50 rounded-lg">
+                    <p className="text-sm text-green-800 flex items-center justify-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      Estimated delivery: 25-35 minutes
+                    </p>
+                  </div>
+                  </div>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
