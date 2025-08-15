@@ -88,7 +88,7 @@ export const columns: ColumnDef<any>[] = [
       return (
         <div className="flex flex-wrap">
           {items.map((item: any, index: number) => (
-            <div key={index} className="ml-1 text-xs ">
+            <div key={index} className="ml-1 text-xs">
               {item.foodItem.name}
               {index < items.length - 1 ? ", " : ""}
             </div>
@@ -110,19 +110,22 @@ export const columns: ColumnDef<any>[] = [
     header: "Payment",
     cell: ({ row }: any) => {
       const { paymentMethod, paid } = row?.original?.bill ?? {};
-  
+
       const methodColor =
         paymentMethod === "CASH"
           ? { bg: "bg-green-100", text: "text-green-500" }
           : { bg: "bg-blue-100", text: "text-blue-500" };
-  
+
       const paidColor = paid
         ? { bg: "bg-green-100", text: "text-green-500", label: "Paid" }
         : { bg: "bg-blue-100", text: "text-blue-500", label: "Not Paid" };
-  
+
       return (
         <div className="flex gap-x-1">
-          <Badge variant="secondary" className={`${methodColor.bg} ${methodColor.text}`}>
+          <Badge
+            variant="secondary"
+            className={`${methodColor.bg} ${methodColor.text}`}
+          >
             {paymentMethod}
           </Badge>
           <Badge className={`${paidColor.bg} ${paidColor.text}`}>
@@ -144,91 +147,74 @@ export const columns: ColumnDef<any>[] = [
       );
     },
   },
-
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }: any) => {
       const status = row.original.status;
+
+      let badgeColor = "bg-gray-100 text-gray-500";
+      let label = "Unknown";
+
+      if (status === "PENDING") {
+        badgeColor = "bg-orange-100 text-orange-500";
+        label = "Pending";
+      } else if (status === "READY") {
+        badgeColor = "bg-green-100 text-green-500";
+        label = "Ready";
+      } else if (status === "COMPLETED") {
+        badgeColor = "bg-green-100 text-green-500";
+        label = "Completed";
+      } else {
+        badgeColor = "bg-yellow-100 text-yellow-500";
+        label = "In Progress";
+      }
+
       return (
-        <div>
-          {status === "PENDING" ? (
-            <Badge variant="outline" className="bg-orange-100 text-orange-500">
-              Pending
-            </Badge>
-          ) : status === "COMPLETED" ? (
-            <Badge variant="secondary" className="bg-green-100 text-green-500">
-              Completed
-            </Badge>
-          ) : status === "READY" ? (
-            <Badge variant="secondary" className="bg-green-100 text-green-500">
-              Ready
-            </Badge>
-          ) :
-           (
-            <Badge
-              variant="secondary"
-              className="bg-yellow-100 text-yellow-500"
-            >
-              Progress
-            </Badge>
-          )}
-        </div>
+        <Badge variant="secondary" className={badgeColor}>
+          {label}
+        </Badge>
       );
     },
   },
-
   {
     accessorKey: "actions",
     header: "Actions",
     cell: ({ row }: any) => {
       const router = useRouter();
-      const actions = row.original.actions;
       const { mutate: confirmOrder } = useOrderConfirmMutation();
       const { mutate: completeOrder } = useOrderCompleteMutation();
       const { mutate: tableMutation } = useTableMutation();
       const { mutate: paymentStatusMutation } = usePaymentStatusMutation();
       const queryClient = useQueryClient();
-      console.log("Table:", row.original?.table);
 
       const handleConfirmOrder = () => {
         confirmOrder(
           { id: row.original.id },
           {
-            onSuccess: (data) => {
-              console.log("ConfirmOrderSuccess:", data);
-              paymentStatusMutation({id: row.original.id, paymentStatus: "true"}, {
-                onSuccess: (data) => {
-                  console.log("PaymentStatusSuccess:", data);
-                },
-                onError: (err) => {
-                  console.log("PaymentStatusError:", err);
-                }
-              })
-              queryClient.invalidateQueries({
-                queryKey: ["order"],
+            onSuccess: () => {
+              paymentStatusMutation({
+                id: row.original.id,
+                paymentStatus: "true",
               });
-              tableMutation(
-                {
-                  tableId: row.original.table.id,
-                  occupied: !row.original.table.occupied,
-                },
-                {
-                  onSuccess: (data) => {
-                    console.log("TableMutationSuccess", data);
-                    queryClient.invalidateQueries({
-                      queryKey: ["getAllTable"],
-                    });
-                    toast.success("Table Updated Successfully");
+              queryClient.invalidateQueries({ queryKey: ["order"] });
+
+              if (row.original.table) {
+                tableMutation(
+                  {
+                    tableId: row.original.table.id,
+                    occupied: !row.original.table?.occupied,
                   },
-                  onError: (error) => {
-                    console.log("Error: ", error);
-                  },
-                }
-              );
-            },
-            onError: (error) => {
-              console.log("ConfirmOrderError:", error);
+                  {
+                    onSuccess: () => {
+                      queryClient.invalidateQueries({
+                        queryKey: ["getAllTable"],
+                      });
+                      toast.success("Table Updated Successfully");
+                    },
+                  }
+                );
+              }
             },
           }
         );
@@ -238,22 +224,38 @@ export const columns: ColumnDef<any>[] = [
         completeOrder(
           { id: row.original.id },
           {
-            onSuccess: (data) => {
-              queryClient.invalidateQueries({
-                queryKey: ["order"],
-              });
-            },
-            onError: (error) => {
-              console.log("CompleteOrderError:", error);
+            onSuccess: () => {
+              queryClient.invalidateQueries({ queryKey: ["order"] });
             },
           }
         );
       };
 
-      console.log("Status:", row.original.table);
+      const status = row.original.status;
 
-      const toComplete =
-        row.original.status === "COMPLETED" && row.original.table.occupied;
+      let buttonLabel = "";
+      if (status === "PENDING") buttonLabel = "Confirm";
+      else if (status === "READY") buttonLabel = "To Complete";
+      else if (
+        status === "WAITING_FOR_INGREDIENTS" ||
+        status === "INGREDIENTS_APPROVED" ||
+        status === "CONFIRMED"
+      )
+        buttonLabel = "In Progress";
+      else if (status === "COMPLETED") buttonLabel = "Success";
+
+      const disabled =
+        status === "WAITING_FOR_INGREDIENTS" ||
+        status === "INGREDIENTS_APPROVED" ||
+        status === "COMPLETED" ||
+        status === "CONFIRMED";
+
+      const onClickAction =
+        status === "PENDING"
+          ? handleConfirmOrder
+          : status === "READY"
+          ? handleCompleteOrder
+          : undefined;
 
       return (
         <div className="flex gap-x-2">
@@ -268,36 +270,21 @@ export const columns: ColumnDef<any>[] = [
             View
           </Button>
           <Button
-            onClick={
-              row.original.status === "PENDING"
-                ? handleConfirmOrder
-                : handleCompleteOrder
-            }
-            disabled={
-              !(
-                row.original.status === "PENDING" || row.original.status === "READY" ||
-                (row.original.status === "COMPLETED" &&
-                  row.original.table.occupied === true)
-              )
-            }
+            onClick={onClickAction}
+            disabled={disabled}
             variant={
-              row.original.status === "PENDING"
+              status === "PENDING"
                 ? "request_ingredients"
-                : row.original.status === "CONFIRMED"
+                : status === "READY"
                 ? "ready_order"
-                : "done"
+                : status === "COMPLETED"
+                ? "done"
+                : "secondary"
             }
             size="sm"
             className="text-xs"
           >
-            {row.original.status === "PENDING"
-              ? "Confirm": 
-              row.original.status === "COMPLETED" && row.original.table.occupied === false
-              ? "Success"
-              : row.original.status === "COMPLETED"
-              ? "Complete"
-              : toComplete || row.original.status === "READY" ? "to Complete"
-              : "Progress"}
+            {buttonLabel}
           </Button>
         </div>
       );
