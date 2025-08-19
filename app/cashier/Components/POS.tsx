@@ -61,7 +61,7 @@ const PosCard = ({ searchQuery }: { searchQuery: string }) => {
                           {food.name}
                         </CardTitle>
                         <CardDescription className="text-md font-semibold text-green-400">
-                          ${food.price}
+                          {food.price} MMK
                         </CardDescription>
                       </div>
                     </CardContent>

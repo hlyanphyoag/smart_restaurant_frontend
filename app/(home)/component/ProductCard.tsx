@@ -30,7 +30,7 @@ const ProductCard = ({ food, addToCart }: ProductCardProps) => {
     <CardDescription>{food.description}</CardDescription>
   </CardContent>
   <CardFooter className="flex justify-between items-center">
-    <p className="text-lg font-semibold text-green-500">${food.price}</p>
+    <p className="text-lg font-semibold text-green-500">{food.price} MMK</p>
     <CardAction>
       <Button
         variant="customize"

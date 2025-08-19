@@ -39,7 +39,7 @@ export const columns: ColumnDef<any>[] = [
     cell: ({ row }) => {
       const price = row.original.price;
       return (
-        <div className="text-sm font-semibold text-neutral-500">${price}</div>
+        <div className="text-sm font-semibold text-neutral-500">{price} MMK</div>
       );
     },
   },

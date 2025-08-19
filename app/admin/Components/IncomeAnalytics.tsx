@@ -20,19 +20,19 @@ const IncomeAnalytics: React.FC<Props> = ({
   const incomeStats = [
     {
       title: "Today",
-      value: `$${incomeData?.today.toFixed(2) || "0.00"}`,
+      value: `${incomeData?.today.toFixed(2) || "0.00"} MMK`,
       icon: Calendar,
       description: "Income today",
     },
     {
       title: "This Month",
-      value: `$${incomeData?.month.toFixed(2) || "0.00"}`,
+      value: `${incomeData?.month.toFixed(2) || "0.00"} MMK`,
       icon: Calendar,
       description: "Income this month",
     },
     {
       title: "This Year",
-      value: `$${incomeData?.year.toFixed(2) || "0.00"}`,
+      value: `${incomeData?.year.toFixed(2) || "0.00"} MMK`,
       icon: Calendar,
       description: "Income this year",
     },

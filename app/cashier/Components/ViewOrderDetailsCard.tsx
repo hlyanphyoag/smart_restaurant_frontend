@@ -203,13 +203,13 @@ const InvoiceBill = ({ orderDetailsById }: { orderDetailsById: any }) => {
                       {/* </div> */}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-right text-sm text-gray-500">
-                      ${item.foodItem.price.toFixed(2)}
+                      {item.foodItem.price.toFixed(2)} MMK
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-right text-sm text-gray-500">
                       {item.quantity}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900">
-                      ${(item.quantity * item.foodItem.price).toFixed(2)}
+                      {(item.quantity * item.foodItem.price).toFixed(2)} MMK
                     </td>
                   </tr>
                 ))}
@@ -224,21 +224,21 @@ const InvoiceBill = ({ orderDetailsById }: { orderDetailsById: any }) => {
             <div className="flex justify-between py-2 border-b border-gray-200">
               <span className="text-gray-600">Subtotal:</span>
               <span className="font-medium">
-                ${orderDetailsById.bill.total.toFixed(2)}
+                {orderDetailsById.bill.total.toFixed(2)} MMK
               </span>
             </div>
             <div className="flex justify-between py-2 border-b border-gray-200">
               <span className="text-gray-600">Tax (0%):</span>
-              <span className="font-medium">$0.00</span>
+              <span className="font-medium">0.00 MMK</span>
             </div>
             <div className="flex justify-between py-2 border-b border-gray-200">
               <span className="text-gray-600">Discount:</span>
-              <span className="font-medium">$0.00</span>
+              <span className="font-medium">0.00 MMK</span>
             </div>
             <div className="flex justify-between py-4">
               <span className="text-lg font-bold text-gray-800">Total:</span>
               <span className="text-lg font-bold text-blue-600">
-                ${orderDetailsById.bill.total.toFixed(2)}
+                {orderDetailsById.bill.total.toFixed(2)} MMK
               </span>
             </div>
           </div>

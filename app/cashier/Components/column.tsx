@@ -102,7 +102,7 @@ export const columns: ColumnDef<any>[] = [
     header: "Total",
     cell: ({ row }: any) => {
       const total = row.original.totalCost;
-      return <div className="text-xs font-semibold">${total.toFixed(2)}</div>;
+      return <div className="text-xs font-semibold">{total.toFixed(2)} MMK</div>;
     },
   },
   {

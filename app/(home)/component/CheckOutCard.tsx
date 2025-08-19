@@ -54,7 +54,7 @@ const CheckOutCard = () => {
                       {item.name}
                     </p>
                     <p className="text-sm text-green-600 font-bold mt-1">
-                      ${item.totalPrice ? item.totalPrice : item.price}
+                      {item.totalPrice ? item.totalPrice : item.price} MMK
                     </p>
                   </div>
                 </div>
@@ -93,7 +93,7 @@ const CheckOutCard = () => {
             <CardFooter className="flex flex-row items-center justify-between gap-2 mt-4 border-t pt-4 border-gray-200">
               <span className="text-lg font-semibold text-gray-700">Total</span>
               <span className="text-2xl font-bold text-green-500">
-                ${GrandTotalPrice()}
+                {GrandTotalPrice()} MMK
               </span>
             </CardFooter>
             <div className="flex flex-col gap-2 mt-2">

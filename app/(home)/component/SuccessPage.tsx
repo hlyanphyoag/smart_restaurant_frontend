@@ -122,7 +122,7 @@ const SuccessPage = () => {
             <div className="flex items-center gap-x-4">
               <h2 className="text-sm font-semibold text-gray-600">Total: </h2>
               <small className="text-xl font-semibold text-green-400">
-                ${OrderData?.totalCost}
+              {OrderData?.totalCost} MMK
               </small>
             </div>
           </div>
@@ -151,7 +151,7 @@ const SuccessPage = () => {
                     </div>
                   </div>
                   <small className="text-sm font-semibold text-green-400">
-                    ${(item.foodItem.price * item.quantity).toFixed(2)}
+                    {(item.foodItem.price * item.quantity).toFixed(2)} MMK
                   </small>
                 </div>
               </div>

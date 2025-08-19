@@ -20,7 +20,7 @@ const TodayStatsCards: React.FC<Props> = ({
   const todayStats = [
     {
       title: "Today's Revenue",
-      value: `$${todaySummary?.summary.income.total.toFixed(2) || "0.00"}`,
+      value: `${todaySummary?.summary.income.total.toFixed(2) || "0.00"} MMK`,
       icon: DollarSign,
       description: "Total income for today",
       change: "+12% from yesterday",
@@ -34,7 +34,7 @@ const TodayStatsCards: React.FC<Props> = ({
     },
     {
       title: "Average Order Value",
-      value: `$${todaySummary?.summary.income.average.toFixed(2) || "0.00"}`,
+      value: `${todaySummary?.summary.income.average.toFixed(2) || "0.00"}MMK`,
       icon: Utensils,
       description: "Average spend per order",
       change: "+3% from yesterday",
