@@ -209,7 +209,7 @@ const OrderDetailPage = () => {
             <div>
               <span className="font-semibold text-gray-500">Total:</span>
               <span className="ml-2 text-blue-700 font-bold">
-                ${order.totalCost}
+                {order.totalCost} MMK
               </span>
             </div>
           </div>
