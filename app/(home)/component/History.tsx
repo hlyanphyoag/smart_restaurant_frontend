@@ -160,7 +160,7 @@ const HistoryPage = ({
                             {item.foodItem.name}
                           </small>
                           <small className="text-xs font-semibold">
-                            ${item.foodItem.price}
+                            {item.foodItem.price} MMK
                           </small>
                         </div>
                       </div>
