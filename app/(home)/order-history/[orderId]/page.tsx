@@ -252,7 +252,7 @@ const OrderDetailPage = () => {
                   </span>
                 </div>
                 <span className="font-semibold text-blue-700 text-lg">
-                  ${item.foodItem.price}
+                  {item.foodItem.price} MMK
                 </span>
               </div>
             ))}
