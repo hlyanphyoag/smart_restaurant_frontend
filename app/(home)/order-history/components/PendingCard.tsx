@@ -18,7 +18,7 @@ const PendingCard = () => {
   );
   const [activeReady, setActiveReady] = useState(false);
 
-  console.log("Ready Order Data: ", readyOrderData);
+  // console.log("Ready Order Data: ", readyOrderData);
 
   const pendingOrder = readyOrderData?.find(
     (order: any) => order.status !== "COMPLETED"
