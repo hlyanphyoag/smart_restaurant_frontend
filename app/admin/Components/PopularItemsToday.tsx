@@ -27,7 +27,7 @@ const PopularItemsToday: React.FC<Props> = ({ popularItems }) => (
           </CardHeader>
           <CardContent className="space-y-2">
             <p className="text-xl font-bold text-slate-800 group-hover:scale-105 transition-transform duration-200">
-              ${item.price.toFixed(2)}
+              {item.price.toFixed(2)} MMK
             </p>
             <div className="flex items-center space-x-2">
               <div className="flex-1 bg-slate-200 rounded-full h-1.5 overflow-hidden">
