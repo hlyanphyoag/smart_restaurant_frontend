@@ -25,7 +25,9 @@ export const useUpdateIngredientMutation = () => {
   >({
     mutationFn: async ({ id, stock }: { id: string; stock: any }) => {
       return await api
-        .patch(`/api/ingredients/${id}`, { stock: parseInt(stock) })
+        .patch(`/api/ingredients/${id}/update-stock`, {
+          quantity: parseInt(stock),
+        })
         .then((res) => res.data);
     },
   });
